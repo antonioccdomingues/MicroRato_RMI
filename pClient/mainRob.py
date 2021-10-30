@@ -95,16 +95,16 @@ class MyRob(CRobLinkAngs):
             #         print("vira à direita")
             #         self.driveMotors(0.15, -0.15)   #virar à direita
 
-            if self.measures.irSensor[left_id]< self.measures.irSensor[right_id]: #tornar esta condição mais robusta(se a diferença for maior do que x...)
+            if (self.measures.irSensor[left_id]< self.measures.irSensor[right_id] and 
+                    self.measures.irSensor[left_id] - self.measures.irSensor[right_id]<0): 
                 print("vira à esquerda")
                 self.driveMotors(-0.12, 0.12)   #virar à esquerda
 
-            if self.measures.irSensor[left_id]> self.measures.irSensor[right_id]:
+            if (self.measures.irSensor[left_id]> self.measures.irSensor[right_id] and
+                    self.measures.irSensor[right_id] - self.measures.irSensor[left_id]<0):
                 print("vira à direita")
                 self.driveMotors(0.12, -0.12)   #virar à direita
                 
-
-
         
 
         #CÓDIGO DOS PROFS
