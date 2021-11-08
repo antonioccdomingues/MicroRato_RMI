@@ -69,18 +69,21 @@ class MyRob(CRobLinkAngs):
         right_id = 2
         back_id = 3
 
-        if (self.measures.irSensor[left_id] <10.0 and self.measures.irSensor[left_id]>=2.0\
-           and self.measures.irSensor[center_id]<2.0)\
-           or (self.measures.irSensor[right_id] <10.0 and self.measures.irSensor[right_id]>=2.0\
-           and self.measures.irSensor[center_id]<2.0):     #Anda em frente
-            print("vai em frente")
+        # if (self.measures.irSensor[left_id] <10.0 and self.measures.irSensor[left_id]>=2.0\
+        #    and self.measures.irSensor[center_id]<2.0)\
+        #    or (self.measures.irSensor[right_id] <10.0 and self.measures.irSensor[right_id]>=2.0\
+        #    and self.measures.irSensor[center_id]<2.0):     #Anda em frente
+        #     print("vai em frente")
+        #     self.driveMotors(0.15, 0.15)
+        if self.measures.irSensor[left_id]>= 2.9:      #caso o robot esteja demasiado perto duma parede esquerda, vai um bocado para a direita (3.33)
+            self.driveMotors(0.15, 0.097)
+        elif self.measures.irSensor[right_id]>= 2.9:   #caso o robot esteja demasiado perto duma parede direita, vai um bocado para a esquerda (3.33)
+            self.driveMotors(0.097, 0.15)
+        else:
             self.driveMotors(0.15, 0.15)
-            if self.measures.irSensor[left_id]>= 3.33:      #caso o robot esteja demasiado perto duma parede esquerda, vai um bocado para a direita (3.33)
-                self.driveMotors(0.03, -0.035)
-            elif self.measures.irSensor[right_id]>= 3.33:   #caso o robot esteja demasiado perto duma parede direita, vai um bocado para a esquerda (3.33)
-                self.driveMotors(-0.035, 0.03)
+            print("vai em frente")
 
-        if self.measures.irSensor[center_id]>=1.7:                #STOP!(1.67)
+        if self.measures.irSensor[center_id]>=1.16:                #STOP!(1.67)
             
             print("stop")
             # if self.measures.irSensor[left_id]< 1.67:              #SABE QUE TEM DE VIRAR PARA A ESQUERDA
