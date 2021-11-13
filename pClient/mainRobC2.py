@@ -4,6 +4,8 @@ from xml.sax import make_parser
 from croblink import *
 from math import *
 import xml.etree.ElementTree as ET
+import numpy as np
+import sys
 
 CELLROWS=7
 CELLCOLS=14
@@ -29,7 +31,7 @@ class MyRob(CRobLinkAngs):
         self.contadorCiclos = 0
         self.firstPosX = 0
         self.firstPosY = 0
-        
+        self.coordinates = np.array([(x,y,check) for x in range(56) for y in range(28) for check in range(1)]) #array com coordenadas do mapa
 
     # In this map the center of cell (i,j), (i in 0..6, j in 0..13) is mapped to labMap[i*2][j*2].
     # to know if there is a wall on top of cell(i,j) (i in 0..5), check if the value of labMap[i*2+1][j*2] is space or not
@@ -102,15 +104,17 @@ class MyRob(CRobLinkAngs):
             dif = 0
             dx_ant = 1.0
             self.contadorCiclos+=1
-            self.firstPosX =self.measures.x #tirar o 3 para ficar caso geral
-            self.firstPosY =self.measures.y #  //  o 11       //        //
+            self.firstPosX =self.measures.x-28 #tirar o 3 para ficar caso geral
+            self.firstPosY =self.measures.y-14 #  //  o 11       //        //
             self.previousGps = [self.measures.x - self.firstPosX, self.measures.y - self.firstPosY]
             self.driveMotors(0.15, 0.15)
+            
+
 
         self.posX = self.measures.x-self.firstPosX #variavel que guarda a coordenada 
         self.posY = self.measures.y-self.firstPosY #sem ter que se estar sempre a fazer a conta
-        print("coordenada x", self.posX)
-        print("coordenada y", self.posY)
+        print("coordenada x: ", self.posX)
+        print("coordenada y: ", self.posY)
 
         if self.count == 5:
             self.count = 0
@@ -148,7 +152,8 @@ class MyRob(CRobLinkAngs):
                         print("avança "+ str(self.posX)+ " " + str(self.posY))
 
                 else:   #encontra-se a meio de uma celula e atualiza o previousGpsd_x_ant = d_x
-                    dif = 2.0 - d_x 
+                    dif = 2.0 - d_x
+                    print("D_X ",d_x) 
                     self.previousGps = [self.posX + dif, self.posY]   #atualiza a posição atual
                     self.driveMotors(-0.15, -0.15)
                     print("stop***********************************")
@@ -165,7 +170,7 @@ class MyRob(CRobLinkAngs):
                 #TODO
 
                 
-
+                
 
 
 
@@ -201,15 +206,21 @@ class MyRob(CRobLinkAngs):
         
         
         #DEPOIS EXECUTAR A FUNÇÃO FINISH
+
         #posicao central do 55,27 e 28,14
         #x,y, e check -> check a 0 quer dizer que nao passou na celula, check a 1 quer dizer que passou
-        coordinates = np.array([(x,y,check) for x in range(56) for y in range(28) for check in range(1)]) #array com coordenadas do mapa
-        for i in range(1512): #numero total de celulas (56*27)
-            if coordinates[i][0] == 28 and coordinates[i][1] == 14: #a celula de origem pode logo ficar a 1
-                coordinates[i][2] = 1 
         
-        #como saber quando ja andou uma casa para adicionar ao 28, 14 
-            
+
+        indInicial = int(self.posX)*27+int(self.posX) #valor de x -> posiçao no array
+        indFinal = indInicial + 27
+        intervalo = self.coordinates[indInicial:indFinal+1] #intervalo de valores possiveis de y, correspondentes a esse valor de x
+        for i in range(len(intervalo)):
+            if intervalo[i][1] == int(self.posY): #se o valor for igual á coordenada y 
+                intervalo[i][2] = 1 #esse valor adquire o valor 1, quer dizer que ja foi visitado
+                print("check:", intervalo[i])
+        
+    
+
 
 class Map():
     def __init__(self, filename):
