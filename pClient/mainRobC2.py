@@ -201,7 +201,14 @@ class MyRob(CRobLinkAngs):
         
         
         #DEPOIS EXECUTAR A FUNÇÃO FINISH
+        #posicao central do 55,27 e 28,14
+        #x,y, e check -> check a 0 quer dizer que nao passou na celula, check a 1 quer dizer que passou
+        coordinates = np.array([(x,y,check) for x in range(56) for y in range(28) for check in range(1)]) #array com coordenadas do mapa
+        for i in range(1512): #numero total de celulas (56*27)
+            if coordinates[i][0] == 28 and coordinates[i][1] == 14: #a celula de origem pode logo ficar a 1
+                coordinates[i][2] = 1 
         
+        #como saber quando ja andou uma casa para adicionar ao 28, 14 
             
 
 class Map():
