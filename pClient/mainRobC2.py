@@ -199,10 +199,8 @@ class MyRob(CRobLinkAngs):
                     #decide para onde vai conforme valores dos sensores e espaços nao visitados
 
                     if self.measures.irSensor[center_id] < 1/0.7:   #Tem a possibilidade de ir em frente pois nao existe parede
-                        #print("pode ir em frente")
                         self.driveMotors(0.15,0.15)  
                     elif(self.measures.irSensor[left_id])< 1/0.7:   #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede
-                        print("pode virar á esquerda")
                         self.driveMotors(-0.129, 0.129)
                         self.viraEsq = 1
                     elif (self.measures.irSensor[right_id])< 1/0.7: #Tem a possibilidade de ir para a direita pois á direita nao tem parede
