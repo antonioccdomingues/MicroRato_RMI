@@ -1,4 +1,4 @@
-
+# coding=utf-8
 import sys
 from xml.sax import make_parser
 from croblink import *
@@ -23,10 +23,12 @@ class MyRob(CRobLinkAngs):
         self.viraDir = 0
         self.maxLeft = 0
         self.maxRight = 0
-
+        self.posX = 0 
+        self.posY = 0
         self.previousGps = [0,0]
         self.contadorCiclos = 0
-        
+        self.firstPosX = 0
+        self.firstPosY = 0
         
 
     # In this map the center of cell (i,j), (i in 0..6, j in 0..13) is mapped to labMap[i*2][j*2].
@@ -100,10 +102,15 @@ class MyRob(CRobLinkAngs):
             dif = 0
             dx_ant = 1.0
             self.contadorCiclos+=1
-            offset[0] =self.measures.x-3 
-            offset[1] =self.measures.y-11
-            self.previousGps = [self.measures.x - offset[0], self.measures.y - offset[1]]
+            self.firstPosX =self.measures.x #tirar o 3 para ficar caso geral
+            self.firstPosY =self.measures.y #  //  o 11       //        //
+            self.previousGps = [self.measures.x - self.firstPosX, self.measures.y - self.firstPosY]
             self.driveMotors(0.15, 0.15)
+
+        self.posX = self.measures.x-self.firstPosX #variavel que guarda a coordenada 
+        self.posY = self.measures.y-self.firstPosY #sem ter que se estar sempre a fazer a conta
+        print("coordenada x", self.posX)
+        print("coordenada y", self.posY)
 
         if self.count == 5:
             self.count = 0
@@ -123,10 +130,10 @@ class MyRob(CRobLinkAngs):
             self.count +=1
         else:
             
-            print("gps "+ str(self.measures.x-offset[0])+ " " + str(self.measures.y-offset[1]))
+            print("gps "+ str(self.posX)+ " " + str(self.posY))
             print(self.measures.compass)
-            d_x = self.measures.x-offset[0] - self.previousGps[0]
-            d_y = self.measures.y-offset[1] - self.previousGps[1]
+            d_x = self.posX - self.previousGps[0]
+            d_y = self.posY - self.previousGps[1]
 
             if(self.measures.compass >=-3 and self.measures.compass <=3) or ((self.measures.compass <=-179 and self.measures.compass >=-180) and (self.measures.compass <=180 and self.measures.compass >=170)):   #Encontra-se na horizontal 
 
@@ -138,11 +145,11 @@ class MyRob(CRobLinkAngs):
                         self.driveMotors(0.15, 0.13)
                     else:
                         self.driveMotors(0.15, 0.15)
-                        print("avança "+ str(self.measures.x-offset[0])+ " " + str(self.measures.y-offset[1]))
+                        print("avança "+ str(self.posX)+ " " + str(self.posY))
 
                 else:   #encontra-se a meio de uma celula e atualiza o previousGpsd_x_ant = d_x
                     dif = 2.0 - d_x 
-                    self.previousGps = [self.measures.x - offset[0] + dif, self.measures.y - offset[1]]   #atualiza a posição atual
+                    self.previousGps = [self.posX + dif, self.posY]   #atualiza a posição atual
                     self.driveMotors(-0.15, -0.15)
                     print("stop***********************************")
                     if self.measures.irSensor[center_id] < 1/0.85:     #Tem a possibilidade de ir em frente
@@ -165,12 +172,12 @@ class MyRob(CRobLinkAngs):
                 if ( d_y < 2.0):  #Anda para algum na vertical
                     
                     self.driveMotors(0.15, 0.15)
-                    print("avança na vertical------------------------------------ "+ str(self.measures.x-offset[0])+ " " + str(self.measures.y-offset[1]))
+                    print("avança na vertical------------------------------------ "+ str(self.posX)+ " " + str(self.posY))
                     
 
                 else:   #encontra-se a meio de uma celula e atualiza o previousGpsd_x_ant = d_x
                     dif = 2.0 - d_y 
-                    self.previousGps = [self.measures.x - offset[0] + dif, self.measures.y - offset[1]]   #atualiza a posição atual
+                    self.previousGps = [self.posX, self.posY + dif]   #atualiza a posição atual (trocaste aqui a subtraçao da dif)
                     self.driveMotors(-0.15, -0.15)
                     print("stop***********************************")
                     #TODO FAZER A CENA DE ACERTAR COM A BUSSOLA
