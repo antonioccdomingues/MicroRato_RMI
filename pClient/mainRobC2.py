@@ -92,109 +92,123 @@ class MyRob(CRobLinkAngs):
         back_id = 3
         lin = 0.14
 
-        print("sensor parede da frente:", (self.measures.irSensor[center_id])) 
+        #print("sensor parede da frente:", (self.measures.irSensor[center_id])) 
         # print("sensor parede da direita:", (self.measures.irSensor[right_id]))
         # print("sensor parede da esquerda:", (self.measures.irSensor[left_id]))
         # print("\n")
         #print(self.measures.compass)
 
         if self.contadorCiclos == 0:
-            global dx_ant
-            global dif
-            dif = 0
-            dx_ant = 1.0
             self.contadorCiclos+=1
             self.firstPosX =self.measures.x-28 #tirar o 3 para ficar caso geral
             self.firstPosY =self.measures.y-14 #  //  o 11       //        //
             self.previousGps = [self.measures.x - self.firstPosX, self.measures.y - self.firstPosY]
-            self.driveMotors(0.15, 0.15)
             
 
 
         self.posX = self.measures.x-self.firstPosX #variavel que guarda a coordenada 
         self.posY = self.measures.y-self.firstPosY #sem ter que se estar sempre a fazer a conta
-        print("coordenada x: ", self.posX)
-        print("coordenada y: ", self.posY)
+        #print("coordenada x: ", self.posX)
+        #print("coordenada y: ", self.posY)
 
-        if self.count == 5:
+        if self.count == 6:
+            if self.viraEsq == 1:
+                self.driveMotors(0.129, -0.129)   
+            if self.viraDir == 1:
+                self.driveMotors(-0.129, 0.129) 
             self.count = 0
             self.viraEsq = 0
             self.viraDir = 0
 
-        elif self.viraEsq == 1:
-            self.driveMotors(-0.13, 0.13)   #virar à esquerda
-            print("vira à esquerda")
-            print("Viragem numero:", self.count)
+        elif self.viraEsq == 1:             #se a flag para virar à esquerda ==1 viraEsquerda
+            self.driveMotors(-0.129, 0.129)  
             self.count +=1
 
-        elif self.viraDir == 1:
-            self.driveMotors(0.13, -0.13)   #virar à direita
-            print("vira à direita")
-            print("Viragem numero:", self.count)
+        elif self.viraDir == 1 :
+            self.driveMotors(0.129, -0.129) #se a flag para virar à esquerda ==1 viraDireita
             self.count +=1
-        else:
+
+        else:                               #Acabou de virar, executa o codigo normal
             
-            print("gps "+ str(self.posX)+ " " + str(self.posY))
-            print(self.measures.compass)
-            d_x = self.posX - self.previousGps[0]
-            d_y = self.posY - self.previousGps[1]
+            d_x = self.posX - self.previousGps[0]   #diferença do deslocamento em xx
+            d_y = self.posY - self.previousGps[1]   #diferença do deslocamento em yy
 
-            if(self.measures.compass >=-3 and self.measures.compass <=3) or ((self.measures.compass <=-179 and self.measures.compass >=-180) and (self.measures.compass <=180 and self.measures.compass >=170)):   #Encontra-se na horizontal 
+            #--------------------------DESLOCAMENTO NA HORIZONTAL--------------------------
+            if(self.measures.compass >=-60 and self.measures.compass <=58) or (self.measures.compass <=-100 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=100):   #Se a bussula se encontra nestes graus entao o robot está na horizontal
 
-                if ( d_x < 2.0):  #Anda para algum na horizontal
+                if (abs(d_x) < 2.0):  #Se a diferença entre a pos atual e anterior<2 apenas anda em frente pois não é o meio da célula
                     
-                    if (self.measures.compass >= -2 and self.measures.compass <=0) or (self.measures.compass>= 179 and self.measures.compass<=180):   #esta ligeiramente inclinado para a direita
+                    #CÓDIGO PARA ORIENTAR O RATO NA HORIZONTAL COM A BUSSOLA PARA NAO ANDAR AOS S's (nao precisas de mexer aqui)
+                    if (self.measures.compass >= -2 and self.measures.compass <0) or (self.measures.compass>= 179 and self.measures.compass<180):   #esta ligeiramente inclinado para a direita
                         self.driveMotors(0.13, 0.15)
-                    elif (self.measures.compass <=2 and self.measures.compass >= 0) or (self.measures.compass>= -180 and self.measures.compass<=-179):  #esta ligeiramente inclinado para a esquerda 
+                    elif (self.measures.compass <=2 and self.measures.compass > 0) or (self.measures.compass> -180 and self.measures.compass<=-179):  #esta ligeiramente inclinado para a esquerda 
                         self.driveMotors(0.15, 0.13)
                     else:
-                        self.driveMotors(0.15, 0.15)
-                        print("avança "+ str(self.posX)+ " " + str(self.posY))
+                        self.driveMotors(0.135, 0.135)
 
-                else:   #encontra-se a meio de uma celula e atualiza o previousGpsd_x_ant = d_x
-                    dif = 2.0 - d_x
-                    print("D_X ",d_x) 
-                    self.previousGps = [self.posX + dif, self.posY]   #atualiza a posição atual
-                    self.driveMotors(-0.15, -0.15)
-                    print("stop***********************************")
-                    if self.measures.irSensor[center_id] < 1/0.85:     #Tem a possibilidade de ir em frente
-                        print("pode ir em frente")
-                        self.driveMotors(0.15,0.15)  
-                    elif(self.measures.irSensor[left_id])< 1/0.7:     #Tem a possibilidade de ir para a esquerda
-                        print("pode virar á esquerda")
-                        self.viraEsq = 1
-                    elif (self.measures.irSensor[right_id])< 1/0.7: #Tem a possibilidade de ir para a direita
-                        self.viraDir = 1
-                        print("pode virar á direita")
-            elif (self.measures.compass >=60 and self.measures.compass <=120) or (self.measures.compass >=-87 and self.measures.compass <=-93):  #encontra-se na vertical   
-                #TODO
-
-                
-                
-
-
-
-                if ( d_y < 2.0):  #Anda para algum na vertical
+                else:   #Rato encontra-se no centro de uma nova celula (na horizontal) => retirar conclusões
                     
-                    self.driveMotors(0.15, 0.15)
-                    print("avança na vertical------------------------------------ "+ str(self.posX)+ " " + str(self.posY))
+                    print("Estou no meio duma célula horizontal\n Posso tirar conclusoes dos censores\n Eis a minha posição: x=" + str(self.posX) + " y=" + str(self.posY) + "\n")
+                    self.previousGps = [round(self.posX), round(self.posY)] #atualiza a posição anterior 
+                    self.driveMotors(-0.15, -0.15)                          #valores para a inércia das rodas
+
+                    #TODO
+                    # ---VERIFICAÇÃO DOS CENSORES---
+                    # POR FLAGS NO ARRAY COM AS RESPETIVAS INFOS RETIRADAS DOS SENSORES                           
                     
 
-                else:   #encontra-se a meio de uma celula e atualiza o previousGpsd_x_ant = d_x
-                    dif = 2.0 - d_y 
-                    self.previousGps = [self.posX, self.posY + dif]   #atualiza a posição atual (trocaste aqui a subtraçao da dif)
-                    self.driveMotors(-0.15, -0.15)
-                    print("stop***********************************")
-                    #TODO FAZER A CENA DE ACERTAR COM A BUSSOLA
-                    if self.measures.irSensor[center_id] < 1/0.75:     #Tem a possibilidade de ir em frente
-                        print("pode ir em frente")
+
+                    #decide para onde vai conforme valores dos sensores
+                    #TODO 
+                    #decide para onde vai conforme valores dos sensores e espaços nao visitados
+
+                    if self.measures.irSensor[center_id] < 1/0.7:   #Tem a possibilidade de ir em frente pois nao existe parede
                         self.driveMotors(0.15,0.15)  
-                    elif(self.measures.irSensor[left_id])< 1/0.7:     #Tem a possibilidade de ir para a esquerda
-                        print("pode virar á esquerda")
+                    elif(self.measures.irSensor[left_id])< 1/0.7:   #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede
+                        self.driveMotors(-0.129, 0.129)
                         self.viraEsq = 1
-                    elif (self.measures.irSensor[right_id])< 1/0.7: #Tem a possibilidade de ir para a direita
+                    elif (self.measures.irSensor[right_id])< 1/0.7: #Tem a possibilidade de ir para a direita pois á direita nao tem parede
+                        self.driveMotors(0.129, -0.129)
                         self.viraDir = 1
-                        print("pode virar á direita")
+
+            #--------------------------DESLOCAMENTO NA VERTICAL--------------------------            
+            elif (self.measures.compass >=60 and self.measures.compass <=120) or (self.measures.compass >=-120 and self.measures.compass <=-60):  #encontra-se na vertical   
+                
+                if ( abs(d_y) < 2.0):  #Se a diferença entre a pos atual e anterior<2 apenas anda em frente pois não é o meio da célula
+                    
+                    #CÓDIGO PARA ORIENTAR O RATO NA VERTICAL COM A BUSSOLA PARA NAO ANDAR AOS S's (nao precisas de mexer aqui)
+                    if (self.measures.compass >= 88 and self.measures.compass <90) or (self.measures.compass<-90 and self.measures.compass>=-92):   #esta ligeiramente inclinado para a direita
+                        self.driveMotors(0.13, 0.15)
+                    elif (self.measures.compass <=93 and self.measures.compass > 90) or (self.measures.compass<= -88 and self.measures.compass>-90):  #esta ligeiramente inclinado para a esquerda 
+                        self.driveMotors(0.15, 0.13)
+                    else:
+                        self.driveMotors(0.135, 0.135)
+                    
+                else:   #Rato encontra-se no centro de uma nova celula (na vertical) => retirar conclusões
+                    
+                    print("Estou no meio duma célula vertical \nPosso tirar conclusoes dos censores\n Eis a minha posição: x=" + str(self.posX) + " y=" + str(self.posY) + "\n")
+                    self.previousGps = [round(self.posX), round(self.posY)] #atualiza a posição anterior
+                    self.driveMotors(-0.15, -0.15)
+                    
+                    #TODO
+                    # ---VERIFICAÇÃO DOS CENSORES---
+                    # POR FLAGS NO ARRAY COM AS RESPETIVAS INFOS RETIRADAS DOS SENSORES
+
+                    #decide para onde vai conforme valores dos sensores
+                    #TODO 
+                    #decide para onde vai conforme valores dos sensores e espaços nao visitados
+
+                    if self.measures.irSensor[center_id] < 1/0.7:   #Tem a possibilidade de ir em frente pois nao existe parede
+                        #print("pode ir em frente")
+                        self.driveMotors(0.15,0.15)  
+                    elif(self.measures.irSensor[left_id])< 1/0.7:   #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede
+                        print("pode virar á esquerda")
+                        self.driveMotors(-0.129, 0.129)
+                        self.viraEsq = 1
+                    elif (self.measures.irSensor[right_id])< 1/0.7: #Tem a possibilidade de ir para a direita pois á direita nao tem parede
+                        self.driveMotors(0.129, -0.129)
+                        self.viraDir = 1
+                        
             
             #TODO Se estiver num beco voltar a trás
             #print(previousGps, self.measures.compass)
