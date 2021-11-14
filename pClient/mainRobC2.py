@@ -31,7 +31,12 @@ class MyRob(CRobLinkAngs):
         self.contadorCiclos = 0
         self.firstPosX = 0
         self.firstPosY = 0
-        self.coordinates = np.array([(x,y,check) for x in range(56) for y in range(28) for check in range(1)]) #array com coordenadas do mapa
+        #self.coordinates = np.array([(x,y,check) for x in range(56) for y in range(28) for check in range(1)]) #array com coordenadas do mapa
+        self.flagDisponivel = 0 
+        self.flagParedeVert = 0
+        self.flagParedeHor = 0
+        self.foo = ""
+        self.coordinates = [[self.foo for y in range(28)] for x in range(56)]
 
     # In this map the center of cell (i,j), (i in 0..6, j in 0..13) is mapped to labMap[i*2][j*2].
     # to know if there is a wall on top of cell(i,j) (i in 0..5), check if the value of labMap[i*2+1][j*2] is space or not
@@ -134,7 +139,7 @@ class MyRob(CRobLinkAngs):
             d_y = self.posY - self.previousGps[1]   #diferença do deslocamento em yy
 
             #--------------------------DESLOCAMENTO NA HORIZONTAL--------------------------
-            if(self.measures.compass >=-60 and self.measures.compass <=58) or (self.measures.compass <=-100 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=100):   #Se a bussula se encontra nestes graus entao o robot está na horizontal
+            if(self.measures.compass >=-60 and self.measures.compass <=58) or (self.measures.compass <=-100 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=100):   #Se a bussola se encontra nestes graus entao o robot está na horizontal
 
                 if (abs(d_x) < 2.0):  #Se a diferença entre a pos atual e anterior<2 apenas anda em frente pois não é o meio da célula
                     
@@ -154,20 +159,27 @@ class MyRob(CRobLinkAngs):
 
                     #TODO
                     # ---VERIFICAÇÃO DOS CENSORES---
-                    # POR FLAGS NO ARRAY COM AS RESPETIVAS INFOS RETIRADAS DOS SENSORES                           
+                    # POR FLAGS NO ARRAY COM AS RESPETIVAS INFOS RETIRADAS DOS SENSORES  
+                    # #falta associar a bussola para saber se está virado pra cima ou pra baixo, ou para esquerda ou direita cof cof                         
+                    if self.measures.irSensor[left_id] > self.measures.irSensor[right_id]: #se tiver parede á esquerda
+                        self.coordinates[round(self.posX)][round(self.posY)+1] = "-"
+                    if abs(self.measures.irSensor[left_id] - self.measures.irSensor[right_id]): #se tiver parede dos dois lados
+                        self.coordinates[round(self.posX)][round(self.posY)+1] = "-"
+                        self.coordinates[round(self.posX)][round(self.posY)-1] = "-"
                     
-
-
                     #decide para onde vai conforme valores dos sensores
                     #TODO 
                     #decide para onde vai conforme valores dos sensores e espaços nao visitados
 
                     if self.measures.irSensor[center_id] < 1/0.7:   #Tem a possibilidade de ir em frente pois nao existe parede
+                        self.coordinates[round(self.posX)+1][round(self.posY)] = "x"
                         self.driveMotors(0.15,0.15)  
                     elif(self.measures.irSensor[left_id])< 1/0.7:   #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede
+                        self.coordinates[round(self.posX)][round(self.posY)+1] = "x"
                         self.driveMotors(-0.129, 0.129)
                         self.viraEsq = 1
                     elif (self.measures.irSensor[right_id])< 1/0.7: #Tem a possibilidade de ir para a direita pois á direita nao tem parede
+                        self.coordinates[round(self.posX)][round(self.posY)-1] = "x"
                         self.driveMotors(0.129, -0.129)
                         self.viraDir = 1
 
@@ -193,27 +205,35 @@ class MyRob(CRobLinkAngs):
                     #TODO
                     # ---VERIFICAÇÃO DOS CENSORES---
                     # POR FLAGS NO ARRAY COM AS RESPETIVAS INFOS RETIRADAS DOS SENSORES
-
+                    if self.measures.irSensor[left_id] > self.measures.irSensor[right_id]: #se tiver parede á esquerda
+                        self.coordinates[round(self.posX)-1][round(self.posY)] = "-"
+                    if abs(self.measures.irSensor[left_id] - self.measures.irSensor[right_id]): #se tiver parede dos dois lados
+                        self.coordinates[round(self.posX)-1][round(self.posY)] = "-"
+                        self.coordinates[round(self.posX)+1][round(self.posY)] = "-"
                     #decide para onde vai conforme valores dos sensores
                     #TODO 
                     #decide para onde vai conforme valores dos sensores e espaços nao visitados
 
                     if self.measures.irSensor[center_id] < 1/0.7:   #Tem a possibilidade de ir em frente pois nao existe parede
+                        self.coordinates[round(self.posX)][round(self.posY)+1] = "x"
                         self.driveMotors(0.15,0.15)  
-                    elif(self.measures.irSensor[left_id])< 1/0.7:   #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede
+                    elif(self.measures.irSensor[left_id])< 1/0.7:   #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede, cof cof sem caso
                         self.driveMotors(-0.129, 0.129)
                         self.viraEsq = 1
                     elif (self.measures.irSensor[right_id])< 1/0.7: #Tem a possibilidade de ir para a direita pois á direita nao tem parede
+                        self.coordinates[round(self.posX)+1][round(self.posY)] = "x"
                         self.driveMotors(0.129, -0.129)
                         self.viraDir = 1
-                        
+
+
+                    
             
             #TODO Se estiver num beco voltar a trás
             #print(previousGps, self.measures.compass)
 
             #if self.measures.irSensor<=2 :  #Pode andar em frente
 
-
+           
        
         
         
@@ -223,15 +243,22 @@ class MyRob(CRobLinkAngs):
         #x,y, e check -> check a 0 quer dizer que nao passou na celula, check a 1 quer dizer que passou
         
 
-        indInicial = int(self.posX)*27+int(self.posX) #valor de x -> posiçao no array
-        indFinal = indInicial + 27
-        intervalo = self.coordinates[indInicial:indFinal+1] #intervalo de valores possiveis de y, correspondentes a esse valor de x
-        for i in range(len(intervalo)):
-            if intervalo[i][1] == int(self.posY): #se o valor for igual á coordenada y 
-                intervalo[i][2] = 1 #esse valor adquire o valor 1, quer dizer que ja foi visitado
-                print("check:", intervalo[i])
+        # indInicial = int(self.posX)*27+int(self.posX) #valor de x -> posiçao no array
+        # indFinal = indInicial + 27
+        # intervalo = self.coordinates[indInicial:indFinal+1] #intervalo de valores possiveis de y, correspondentes a esse valor de x
+        # for i in range(len(intervalo)):
+        #     if intervalo[i][1] == int(self.posY): #se o valor for igual á coordenada y
+        #         if self.flagDisponivel == 1: 
+        #             intervalo[i][2] = 1 #esse valor adquire o valor 1, quer dizer que é celula x
+        #         elif self.flagParedeVert == 1: 
+        #             intervalo[i][2] = 2 #esse valor adquire 2, quer dizer que é parede vertical |
+        #         elif self.flagParedeHor == 1:
+        #             intervalo[i][2] = 3 #esse valor adquire 3, quer dizer que é parede horizontal -
+        #         else:
+        #             intervalo[i][2] = 4 #esse valor adquire 4, quer dizer que unknown ""
+        #             print("check:", intervalo[i])
         
-    
+        print(self.coordinates)
 
 
 class Map():
