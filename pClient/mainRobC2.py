@@ -151,12 +151,12 @@ class MyRob(CRobLinkAngs):
                 if (abs(d_x) < 2.0):  #Se a diferença entre a pos atual e anterior<2 apenas anda em frente pois não é o meio da célula
                     
                     #CÓDIGO PARA ORIENTAR O RATO NA HORIZONTAL COM A BUSSOLA PARA NAO ANDAR AOS S's (nao precisas de mexer aqui)
-                    if (self.measures.compass >= -2 and self.measures.compass <0) or (self.measures.compass>= 179 and self.measures.compass<180):   #esta ligeiramente inclinado para a direita
+                    if (self.measures.compass >= -4 and self.measures.compass <0) or (self.measures.compass>= 176 and self.measures.compass<180):   #esta ligeiramente inclinado para a direita
                         self.driveMotors(0.13, 0.15)
-                    elif (self.measures.compass <=2 and self.measures.compass > 0) or (self.measures.compass> -180 and self.measures.compass<=-179):  #esta ligeiramente inclinado para a esquerda 
+                    elif (self.measures.compass <=4 and self.measures.compass > 0) or (self.measures.compass> -180 and self.measures.compass<=-176):  #esta ligeiramente inclinado para a esquerda 
                         self.driveMotors(0.15, 0.13)
                     else:
-                        self.driveMotors(0.135, 0.135)
+                        self.driveMotors(0.15, 0.15)
 
                 else:   #Rato encontra-se no centro de uma nova celula (na horizontal) => retirar conclusões
                     
@@ -225,12 +225,12 @@ class MyRob(CRobLinkAngs):
                 if ( abs(d_y) < 2.0):  #Se a diferença entre a pos atual e anterior<2 apenas anda em frente pois não é o meio da célula
                     
                     #CÓDIGO PARA ORIENTAR O RATO NA VERTICAL COM A BUSSOLA PARA NAO ANDAR AOS S's (nao precisas de mexer aqui)
-                    if (self.measures.compass >= 88 and self.measures.compass <90) or (self.measures.compass<-90 and self.measures.compass>=-92):   #esta ligeiramente inclinado para a direita
+                    if (self.measures.compass >= 86 and self.measures.compass <90) or (self.measures.compass<-90 and self.measures.compass>=-94):   #esta ligeiramente inclinado para a direita
                         self.driveMotors(0.13, 0.15)
-                    elif (self.measures.compass <=93 and self.measures.compass > 90) or (self.measures.compass<= -88 and self.measures.compass>-90):  #esta ligeiramente inclinado para a esquerda 
+                    elif (self.measures.compass <=94 and self.measures.compass > 90) or (self.measures.compass<= -86 and self.measures.compass>-90):  #esta ligeiramente inclinado para a esquerda 
                         self.driveMotors(0.15, 0.13)
                     else:
-                        self.driveMotors(0.135, 0.135)
+                        self.driveMotors(0.15, 0.15)
                     
                 else:   #Rato encontra-se no centro de uma nova celula (na vertical) => retirar conclusões
                     
