@@ -6,6 +6,7 @@ from math import *
 import xml.etree.ElementTree as ET
 import numpy as np
 import sys
+import random
 
 CELLROWS=7
 CELLCOLS=14
@@ -23,6 +24,8 @@ class MyRob(CRobLinkAngs):
         self.count = 0
         self.viraEsq = 0
         self.viraDir = 0
+        self.reverte = 0
+        self.countReverte = 0
         self.maxLeft = 0
         self.maxRight = 0
         self.posX = 0 
@@ -124,13 +127,17 @@ class MyRob(CRobLinkAngs):
         self.posY = self.firstPosY - self.measures.y #sem ter que se estar sempre a fazer a conta
         #print("coordenada x: ", self.posX)
         #print("coordenada y: ", self.posY)
-        print("compass: ", self.measures.compass)
+        #print("compass: ", self.measures.compass)
 
-        if self.count == 6:
+        if self.count == 6 or self.countReverte == 12:
             if self.viraEsq == 1:
                 self.driveMotors(0.129, -0.129)   
             if self.viraDir == 1:
                 self.driveMotors(-0.129, 0.129) 
+            if self.reverte == 1:
+                self.driveMotors(-0.129, 0.129) # ou seja ele reverte para a direita
+            self.countReverte = 0
+            self.reverte = 0
             self.count = 0
             self.viraEsq = 0
             self.viraDir = 0
@@ -143,6 +150,9 @@ class MyRob(CRobLinkAngs):
             self.driveMotors(0.129, -0.129) #se a flag para virar à esquerda ==1 viraDireita
             self.count +=1
 
+        elif self.reverte == 1 :
+            self.driveMotors(0.129, -0.129) #se a flag para reverter ==1 
+            self.countReverte +=1
         else:                               #Acabou de virar, executa o codigo normal
             
             d_x = self.posX - self.previousGps[0]   #diferença do deslocamento em xx
@@ -163,7 +173,7 @@ class MyRob(CRobLinkAngs):
 
                 else:   #Rato encontra-se no centro de uma nova celula (na horizontal) => retirar conclusões
                     
-                    print("Estou no meio duma célula horizontal\n Posso tirar conclusoes dos censores\n Eis a minha posição: x=" + str(self.posX) + " y=" + str(self.posY) + "\n")
+                    #print("Estou no meio duma célula horizontal\n Posso tirar conclusoes dos censores\n Eis a minha posição: x=" + str(self.posX) + " y=" + str(self.posY) + "\n")
                     self.previousGps = [round(self.posX), round(self.posY)] #atualiza a posição anterior 
                     self.driveMotors(-0.15, -0.15)                          #valores para a inércia das rodas
                     self.coordinates[round(self.posY)][round(self.posX)] = "X" #a posicao onde se encontra esta vazia (x)
@@ -202,17 +212,46 @@ class MyRob(CRobLinkAngs):
                     #decide para onde vai conforme valores dos sensores
                     #TODO 
                     #decide para onde vai conforme valores dos sensores e espaços nao visitados
-
-                    if self.measures.irSensor[center_id] < 1/0.7:   #Tem a possibilidade de ir em frente pois nao existe parede
+                    #print(self.measures.compass)
+                    #print(self.measures.irSensor[right_id]< 1/0.75)
+                    #print(self.coordinates[round(self.posY)-2][round(self.posX)])
+                    if (self.measures.irSensor[center_id]< 1/0.75 and self.measures.compass <= 10 and self.measures.compass >= -10 and self.coordinates[round(self.posY)][round(self.posX)+2] != "X")\
+                     or (self.measures.irSensor[center_id]< 1/0.75 and (self.measures.compass > 170 or self.measures.compass < -170) and self.coordinates[round(self.posY)][round(self.posX)-2] != "X"):   #Tem a possibilidade de ir em frente pois nao existe parede e não tem parede visitada
                         self.driveMotors(0.15,0.15)
-
-                    elif(self.measures.irSensor[left_id])< 1/0.7:   #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede
+                        print("Vou em frente")
+                    elif(self.measures.irSensor[left_id]< 1/0.75 and self.measures.compass <= 10 and self.measures.compass >= -10 and self.coordinates[round(self.posY)-2][round(self.posX)] != "X")\
+                     or (self.measures.irSensor[left_id]< 1/0.75 and (self.measures.compass > 170 or self.measures.compass < -170) and self.coordinates[round(self.posY)+2][round(self.posX)] != "X"):     #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede e nao foi visitada
                         self.driveMotors(-0.129, 0.129)
                         self.viraEsq = 1
-
-                    elif (self.measures.irSensor[right_id])< 1/0.7: #Tem a possibilidade de ir para a direita pois á direita nao tem parede
+                        print("vou virar á esquerda")
+                    elif(self.measures.irSensor[right_id]< 1/0.75 and self.measures.compass <= 10 and self.measures.compass >= -10 and self.coordinates[round(self.posY)+2][round(self.posX)] != "X")\
+                     or (self.measures.irSensor[right_id]< 1/0.75 and (self.measures.compass > 170 or self.measures.compass < -170) and self.coordinates[round(self.posY)-2][round(self.posX)] != "X"):     #Tem a possibilidade de ir para a direita pois à direita nao tem parede e nao foi visitada
                         self.driveMotors(0.129, -0.129)
                         self.viraDir = 1
+                        print("vou virar á direita")
+                    elif (self.measures.irSensor[right_id]>= 1/0.75 and self.measures.irSensor[center_id]>= 1/0.75 and self.measures.irSensor[left_id]>= 1/0.75):
+                        self.driveMotors(0.129, -0.129)
+                        self.reverte = 1
+                    #TODO QUANDO ESTÁ NUM BECO
+                    else:   #As posições à volta dele já estão todas visitadas
+                        print("já visitei tudo à minha volta")
+                        if (self.measures.irSensor[left_id]< 1/0.75) and (self.measures.irSensor[right_id]< 1/0.75):
+                            a = random.randrange(2)
+                            print(a)
+                            if a==0:
+                                self.driveMotors(0.129, -0.129)
+                                self.viraDir = 1
+                            elif a==1:
+                                self.driveMotors(-0.129, 0.129)
+                                self.viraEsq = 1
+                        elif (self.measures.irSensor[left_id]< 1/0.75):
+                            self.driveMotors(-0.129, 0.129)
+                            self.viraEsq = 1
+                        elif (self.measures.irSensor[right_id]< 1/0.75):
+                            self.driveMotors(0.129, -0.129)
+                            self.viraDir = 1
+                        elif self.measures.irSensor[center_id] < 1/0.75:
+                            self.driveMotors(0.15,0.15)
                             
 
             #--------------------------DESLOCAMENTO NA VERTICAL--------------------------            
@@ -230,7 +269,7 @@ class MyRob(CRobLinkAngs):
                     
                 else:   #Rato encontra-se no centro de uma nova celula (na vertical) => retirar conclusões
                     
-                    print("Estou no meio duma célula vertical \nPosso tirar conclusoes dos censores\n Eis a minha posição: x=" + str(self.posX) + " y=" + str(self.posY) + "\n")
+                    #print("Estou no meio duma célula vertical \nPosso tirar conclusoes dos censores\n Eis a minha posição: x=" + str(self.posX) + " y=" + str(self.posY) + "\n")
                     self.previousGps = [round(self.posX), round(self.posY)] #atualiza a posição anterior
                     self.driveMotors(-0.15, -0.15)
                     self.coordinates[round(self.posY)][round(self.posX)] = "X" #a posicao onde se encontra esta vazia (x)
@@ -269,14 +308,14 @@ class MyRob(CRobLinkAngs):
                     #TODO 
                     #decide para onde vai conforme valores dos sensores e espaços nao visitados
 
-                    if self.measures.irSensor[center_id] < 1/0.7:   #Tem a possibilidade de ir em frente pois nao existe parede
+                    if self.measures.irSensor[center_id] < 1/0.75:   #Tem a possibilidade de ir em frente pois nao existe parede
                         self.driveMotors(0.15,0.15)  
 
-                    elif(self.measures.irSensor[left_id])< 1/0.7:   #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede
+                    elif(self.measures.irSensor[left_id])< 1/0.75:   #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede
                         self.driveMotors(-0.129, 0.129)
                         self.viraEsq = 1
 
-                    elif (self.measures.irSensor[right_id])< 1/0.7: #Tem a possibilidade de ir para a direita pois á direita nao tem parede
+                    elif (self.measures.irSensor[right_id])< 1/0.75: #Tem a possibilidade de ir para a direita pois á direita nao tem parede
                         self.driveMotors(0.129, -0.129)
                         self.viraDir = 1
 
