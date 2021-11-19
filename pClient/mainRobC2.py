@@ -232,6 +232,7 @@ class MyRob(CRobLinkAngs):
                     else:   #As posições à volta dele já estão todas visitadas
                         print("já visitei tudo à minha volta")
                         if (self.measures.irSensor[left_id]< 1/0.72) and (self.measures.irSensor[right_id]< 1/0.72):
+                            print("pode ir para a esquerda ou direita")
                             a = random.randrange(2)
                             print(a)
                             if a==0:
@@ -241,13 +242,16 @@ class MyRob(CRobLinkAngs):
                                 self.driveMotors(-0.129, 0.129)
                                 self.viraEsq = 1
                         elif (self.measures.irSensor[left_id]< 1/0.72):
+                            print("so pode ir para a esquerda")
                             self.driveMotors(-0.129, 0.129)
                             self.viraEsq = 1
                         elif (self.measures.irSensor[right_id]< 1/0.72):
                             self.driveMotors(0.129, -0.129)
+                            print("so pode ir para a direita")
                             self.viraDir = 1
                         elif self.measures.irSensor[center_id] < 1/0.72:
                             self.driveMotors(0.15,0.15)
+                            print("so pode ir em frente")
                             
 
             #--------------------------DESLOCAMENTO NA VERTICAL--------------------------            
@@ -330,7 +334,7 @@ class MyRob(CRobLinkAngs):
                             elif a==1:
                                 self.driveMotors(-0.129, 0.129)
                                 self.viraEsq = 1
-                        if self.measures.irSensor[center_id] < 1/0.72:
+                        elif self.measures.irSensor[center_id] < 1/0.72:
                             self.driveMotors(0.15,0.15)
                         elif (self.measures.irSensor[left_id]< 1/0.72):
                             self.driveMotors(-0.129, 0.129)
@@ -371,7 +375,7 @@ class Map():
 
 rob_name = "pClient1"
 host = "localhost"
-pos = 1
+pos = 
 mapc = None
 
 for i in range(1, len(sys.argv),2):
