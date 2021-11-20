@@ -118,9 +118,9 @@ class MyRob(CRobLinkAngs):
             for i in range(27):
                 for j in range(55):
                     outfile.write(self.coordinates[i][j])
-                    #print(self.coordinates[i][j])
+                    print(self.coordinates[i][j])
                 outfile.write("\n")
-       # print("\n".join(["".join([x for x in row])for row in self.coordinates]))
+        print("\n".join(["".join([x for x in row])for row in self.coordinates]))
         
         self.coordinates[13][27] = "I" #posicao inicial
         self.posX = self.measures.x-self.firstPosX #variavel que guarda a coordenada 
@@ -136,7 +136,7 @@ class MyRob(CRobLinkAngs):
                 self.driveMotors(-0.129, 0.129) 
             if self.reverte == 1:
                 self.driveMotors(-0.129, 0.129) # ou seja ele reverte para a direita
-            print(self.measures.compass)
+            #print(self.measures.compass)
             self.countReverte = 0
             self.reverte = 0
             self.count = 0
@@ -252,6 +252,7 @@ class MyRob(CRobLinkAngs):
                         elif self.measures.irSensor[center_id] < 1/0.72:
                             self.driveMotors(0.15,0.15)
                             print("so pode ir em frente")
+                        
                             
 
             #--------------------------DESLOCAMENTO NA VERTICAL--------------------------            
@@ -375,7 +376,7 @@ class Map():
 
 rob_name = "pClient1"
 host = "localhost"
-pos = 
+pos = 1
 mapc = None
 
 for i in range(1, len(sys.argv),2):

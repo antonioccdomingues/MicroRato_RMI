@@ -8,6 +8,8 @@ import numpy as np
 import sys
 import random
 
+import a_star_path_finding as pf
+
 CELLROWS=7
 CELLCOLS=14
 
@@ -15,6 +17,7 @@ class MyRob(CRobLinkAngs):
     global offset
     global dif
     
+
     
     dif = 0
     offset = [0,0]
@@ -37,8 +40,10 @@ class MyRob(CRobLinkAngs):
         self.flagDisponivel = 0 
         self.flagParedeVert = 0
         self.flagParedeHor = 0
-        self.foo = " " #inicializa todos os espaços com " "
+        self.foo = "-" #inicializa todos os espaços com "-"
         self.coordinates = [[self.foo for x in range(55)] for y in range(27)] #cria um array bidimensional [56][27]
+        self.walls = []
+        self.nObjetivos = 0
         
     # In this map the center of cell (i,j), (i in 0..6, j in 0..13) is mapped to labMap[i*2][j*2].
     # to know if there is a wall on top of cell(i,j) (i in 0..5), check if the value of labMap[i*2+1][j*2] is space or not
@@ -101,17 +106,15 @@ class MyRob(CRobLinkAngs):
         back_id = 3
         lin = 0.14
 
-        #print("sensor parede da frente:", (self.measures.irSensor[center_id])) 
-        # print("sensor parede da direita:", (self.measures.irSensor[right_id]))
-        # print("sensor parede da esquerda:", (self.measures.irSensor[left_id]))
-        # print("\n")
-        #print(self.measures.compass)
 
-        if self.contadorCiclos == 0:
+        if self.contadorCiclos == 0: #CICLO 0
             self.contadorCiclos+=1
             self.firstPosX =self.measures.x-27 #tirar o 3 para ficar caso geral
             self.firstPosY =self.measures.y-14 #  //  o 11       //        //
             self.previousGps = [self.measures.x - self.firstPosX, self.measures.y - self.firstPosY]
+            self.nObjetivos = int(self.nBeacons)-1    #-1 PQE O INICIO TAMBEM CONTA COMO BEACON
+            #print(self.coordinates)
+           
             
         
         with open('map.out', 'w') as outfile: 
@@ -120,9 +123,9 @@ class MyRob(CRobLinkAngs):
                     outfile.write(self.coordinates[i][j])
                     #print(self.coordinates[i][j])
                 outfile.write("\n")
-       # print("\n".join(["".join([x for x in row])for row in self.coordinates]))
+        #print("\n".join(["".join([x for x in row])for row in self.coordinates]))
         
-        self.coordinates[13][27] = "I" #posicao inicial
+        self.coordinates[13][27] = "X" #posicao inicial
         self.posX = self.measures.x-self.firstPosX #variavel que guarda a coordenada 
         self.posY = self.firstPosY - self.measures.y #sem ter que se estar sempre a fazer a conta
         #print("coordenada x: ", self.posX)
@@ -136,7 +139,7 @@ class MyRob(CRobLinkAngs):
                 self.driveMotors(-0.129, 0.129) 
             if self.reverte == 1:
                 self.driveMotors(-0.129, 0.129) # ou seja ele reverte para a direita
-            print(self.measures.compass)
+            #print(self.measures.compass)
             self.countReverte = 0
             self.reverte = 0
             self.count = 0
@@ -174,7 +177,7 @@ class MyRob(CRobLinkAngs):
 
                 else:   #Rato encontra-se no centro de uma nova celula (na horizontal) => retirar conclusões
                     
-                    self.previousGps = [round(self.posX), round(self.posY)]     #atualiza a posição anterior 
+                    self.previousGps = [round(self.posX), round(self.posY)]     #atualiza a posição anterior
                     self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
                     self.coordinates[round(self.posY)][round(self.posX)] = "X"  #a posicao onde se encontra esta vazia (x)
                     
@@ -182,7 +185,7 @@ class MyRob(CRobLinkAngs):
                     # POR FLAGS NO ARRAY COM AS RESPETIVAS INFOS RETIRADAS DOS SENSORES  
                     if self.measures.compass <= 10 and self.measures.compass >= -10:    #se estiver virado para norte (direita)
                         if self.measures.irSensor[center_id] > 1.2:                     #se tiver parede à frente
-                            self.coordinates[round(self.posY)][round(self.posX+1)] = "|"
+                            self.coordinates[round(self.posY)][round(self.posX+1)] = "-"
                         else: 
                             self.coordinates[round(self.posY)][round(self.posX+1)] = "X"
                         if self.measures.irSensor[left_id] > 1.2:   #se tiver parede á esquerda
@@ -196,7 +199,7 @@ class MyRob(CRobLinkAngs):
 
                     elif abs(self.measures.compass) <= 180 and abs(self.measures.compass) >= 170: #se estiver virado para Sul (esquerda)
                         if self.measures.irSensor[center_id] > 1.2: #se tiver parede à frente
-                            self.coordinates[round(self.posY)][round(self.posX-1)] = "|"
+                            self.coordinates[round(self.posY)][round(self.posX-1)] = "-"
                         else: 
                             self.coordinates[round(self.posY)][round(self.posX-1)] = "X"
                         if self.measures.irSensor[left_id] > 1.2:   #se tiver parede á esquerda
@@ -208,7 +211,29 @@ class MyRob(CRobLinkAngs):
                         else:  
                             self.coordinates[round(self.posY)-1][round(self.posX)] = "X"
                      
-                    
+                    #verifica se é um beacon
+                    if self.measures.ground >0: #significa que está em cima de um checkpoint
+                        #chamar o a* calcular o caminho, e escrever logo no ficheiro
+                        
+                        for i in range(27):
+                            for j in range(55):
+                                if str(self.coordinates[i][j]) == "-":   #verificar se é ij ou ji 
+                                    self.walls.append((j, i))
+
+                        self.walls.remove((28,13))
+                        
+                        print("paredes: " + str(self.walls))
+                        #chamar o A*
+                        if self.measures.ground ==1:
+                            a = pf.AStar()
+                            # walls = [(0, 5), (1, 0), (1, 1), (1, 5), (2, 3),
+                            #         (3, 1), (3, 2), (3, 5), (4, 1), (4, 4), (5, 1)]
+                            #print(walls)
+                            a.init_grid(56, 28, self.walls, (27, 13), (round(self.posX), round(self.posY)))
+                            path = a.solve()
+                            print(path)
+                                
+
                     #decide para onde vai conforme valores dos sensores
                     
                     if (self.measures.irSensor[center_id]< 1/0.72 and self.measures.compass <= 10 and self.measures.compass >= -10 and self.coordinates[round(self.posY)][round(self.posX)+2] != "X")\
@@ -281,11 +306,11 @@ class MyRob(CRobLinkAngs):
                         else: 
                             self.coordinates[round(self.posY-1)][round(self.posX)] = "X"
                         if self.measures.irSensor[left_id] > 1.2: #se tiver parede á esquerda
-                            self.coordinates[round(self.posY)][round(self.posX)-1] = "|"
+                            self.coordinates[round(self.posY)][round(self.posX)-1] = "-"
                         else:
                             self.coordinates[round(self.posY)][round(self.posX)-1] = "X" 
                         if self.measures.irSensor[right_id] > 1.2: #se tiver parede á direita not sure
-                            self.coordinates[round(self.posY)][round(self.posX)+1] = "|"
+                            self.coordinates[round(self.posY)][round(self.posX)+1] = "-"
                         else:
                             self.coordinates[round(self.posY)][round(self.posX)+1] = "X"
 
@@ -295,13 +320,36 @@ class MyRob(CRobLinkAngs):
                         else: 
                             self.coordinates[round(self.posY+1)][round(self.posX)] = "X"
                         if self.measures.irSensor[left_id] > 1.2: #se tiver parede á esquerda
-                            self.coordinates[round(self.posY)][round(self.posX+1)] = "|"
+                            self.coordinates[round(self.posY)][round(self.posX+1)] = "-"
                         else:
                             self.coordinates[round(self.posY)][round(self.posX+1)] = "X"
                         if self.measures.irSensor[right_id] > 1.2: #se tiver parede á direita
-                            self.coordinates[round(self.posY)][round(self.posX)-1] = "|"
+                            self.coordinates[round(self.posY)][round(self.posX)-1] = "-"
                         else:
                             self.coordinates[round(self.posY)][round(self.posX)-1] = "X"
+                    
+
+                    #verifica se é um beacon
+                    if self.measures.ground >0: #significa que está em cima de um checkpoint
+                        #chamar o a* calcular o caminho, e escrever logo no ficheiro
+                        
+                        for i in range(27):
+                            for j in range(55):
+                                print(j)
+                                if str(self.coordinates[i][j]) == "-":   #verificar se é ij ou ji 
+                                    self.walls.append((j, i))
+                        self.walls.remove((28,13))
+                        
+                        #print("paredes: " + str(self.walls))
+                        #chamar o A*
+                        if self.measures.ground ==1:
+                            a = pf.AStar()
+                            # walls = [(0, 5), (1, 0), (1, 1), (1, 5), (2, 3),
+                            #         (3, 1), (3, 2), (3, 5), (4, 1), (4, 4), (5, 1)]
+                            #print(walls)
+                            a.init_grid(56, 28, self.walls, (27, 13), (round(self.posX), round(self.posY)))
+                            path = a.solve()
+                            print(path)
 
                     #decide para onde vai conforme valores dos sensores
                     
@@ -375,7 +423,7 @@ class Map():
 
 rob_name = "pClient1"
 host = "localhost"
-pos = 
+pos = 1
 mapc = None
 
 for i in range(1, len(sys.argv),2):
