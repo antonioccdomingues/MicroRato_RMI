@@ -376,7 +376,7 @@ class Map():
 
 rob_name = "pClient1"
 host = "localhost"
-pos = 1
+pos = 0
 mapc = None
 
 for i in range(1, len(sys.argv),2):
