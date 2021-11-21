@@ -99,9 +99,7 @@ class MyRob(CRobLinkAngs):
                 if self.measures.returningLed==True:
                     self.setReturningLed(False)
                 self.wander()
-
-        
-            
+    
 
     def wander(self):
         center_id = 0
@@ -114,13 +112,11 @@ class MyRob(CRobLinkAngs):
         if self.contadorCiclos == 0: #CICLO 0
             self.contadorCiclos+=1
             print(self.measures.x)
-            print(self.measures.y)
+            print(-self.measures.y)
             self.firstPosX =self.measures.x-27 #tirar o 3 para ficar caso geral
             self.firstPosY =self.measures.y-14 #  //  o 11       //        //
-            self.previousGps = [self.measures.x - self.firstPosX, self.measures.y - self.firstPosY]
+            self.previousGps = [self.measures.x - self.firstPosX, self.measures.y -self.firstPosY]
             self.nObjetivos = int(self.nBeacons)-1    #-1 PQE O INICIO TAMBEM CONTA COMO BEACON
-            print("posição atual " + str(round(self.posX)) +", " +str(self.posY))
-           
             
         
         with open('map.out', 'w') as outfile: 
@@ -133,10 +129,8 @@ class MyRob(CRobLinkAngs):
         
         self.coordinates[13][27] = "X" #posicao inicial
         self.posX = self.measures.x-self.firstPosX #variavel que guarda a coordenada 
-        self.posY = self.measures.y- self.firstPosY   #sem ter que se estar sempre a fazer a conta
-        #print("coordenada x: ", self.posX)
-        #print("coordenada y: ", self.posY)
-        #print("compass: ", self.measures.compass)
+        self.posY = self.firstPosY - self.measures.y     #sem ter que se estar sempre a fazer a conta
+
 
         if self.count == 6 or self.countReverte == 12:
             if self.viraEsq == 1:
@@ -145,7 +139,7 @@ class MyRob(CRobLinkAngs):
                 self.driveMotors(-0.129, 0.129) 
             if self.reverte == 1:
                 self.driveMotors(-0.129, 0.129) # ou seja ele reverte para a direita
-            #print(self.measures.compass)
+            
             self.countReverte = 0
             self.reverte = 0
             self.count = 0
@@ -182,11 +176,11 @@ class MyRob(CRobLinkAngs):
                         self.driveMotors(0.15, 0.15)
 
                 else:   #Rato encontra-se no centro de uma nova celula (na horizontal) => retirar conclusões
-                    
+                    self.contadorCiclos +=1
                     self.previousGps = [round(self.posX), round(self.posY)]     #atualiza a posição anterior
                     self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
                     self.coordinates[round(self.posY)][round(self.posX)] = "X"  #a posicao onde se encontra esta vazia (x)
-                    print("Posição atual X: " + str(self.posX) + " Y: " + str(self.posY))
+                    
                     # ---VERIFICAÇÃO DOS CENSORES---
                     # POR FLAGS NO ARRAY COM AS RESPETIVAS INFOS RETIRADAS DOS SENSORES  
                     if self.measures.compass <= 10 and self.measures.compass >= -10:    #se estiver virado para norte (direita)
@@ -219,48 +213,17 @@ class MyRob(CRobLinkAngs):
                      
                     #verifica se é um beacon
                     if self.measures.ground >0: #significa que está em cima de um checkpoint
+                        print("posição atual " + str(round(self.posX)) +", " +str(round(self.posY)))
                         #chamar o a* calcular o caminho, e escrever logo no ficheiro
-                        print("posição atual " + str(round(self.posX)) +", " +str(self.posY))
-                        for i in range(27):
-                            for j in range(55):
+                        self.coordinates[13][28] = 'X'
+                      
+                        for i in range(len(self.coordinates)):#LINHAS
+                            for j in range(len(self.coordinates[i])):
                                 if str(self.coordinates[i][j]) == "-":   #verificar se é ij ou ji 
-                                    self.walls.append((i, j))
-                        self.objetivosPassados.append((round(self.posX), round(self.posY)))
-                        self.objetivosPassados = list(set([i for i in self.objetivosPassados]))    #remove duplicates (para o caso de passar varias vezes no mesmo checkpoint)
-                       
-                        # a = pf.AStar()
-                        
-                        # #print(self.walls)
-                        # a.init_grid(56, 26, self.walls, (27, 13), (round(self.posX), round(self.posY)))
-                        # path = a.solve()
-                        # #print(path)
-
-                        if len(self.objetivosPassados)>1: #para guardar num array a solução
-                            solucao=[]
-                            #executa o A* e imprime no ficheiro 
-                            for b in range(len(self.objetivosPassados)):
-                                if b< len(self.objetivosPassados)-1:
-                                    
-                                    a = pf.AStar()
-                                    a.init_grid(56, 28, self.walls, self.objetivosPassados[b], self.objetivosPassados[b+1])
-                                    path = a.solve()
-                                    solucao.append(path)
-                                    #print(path)
-
-                                else:    
-                                    a = pf.AStar()
-                                    a.init_grid(56, 28, self.walls, self.objetivosPassados[b], (27, 13))
-                                    path = a.solve()
-                                    solucao.append(path)
-                                    #print(path)
-                            #print("objetivos passados:  " + str(self.objetivosPassados) + "\n")
-                            print("Solução" + str(solucao))
-                            for x in range(len(solucao)): #ideia para imprimir(não é boa)
-                                if(x%2 == 0):
-                                    print(solucao[x])
-                    
-
-                        
+                                    self.walls.append((j, i))
+                                
+                        self.objetivosPassados.append((round(self.posX), abs(round(self.posY))))
+                        self.objetivosPassados = list(set([i for i in self.objetivosPassados]))    #remove duplicates (para o caso de passar varias vezes no mesmo checkpoint) 
 
                     #decide para onde vai conforme valores dos sensores
                     
@@ -283,11 +246,11 @@ class MyRob(CRobLinkAngs):
                         self.reverte = 1
                    
                     else:   #As posições à volta dele já estão todas visitadas
-                        print("já visitei tudo à minha volta")
+                        
                         if (self.measures.irSensor[left_id]< 1/0.72) and (self.measures.irSensor[right_id]< 1/0.72):
-                            print("pode ir para a esquerda ou direita")
+                            
                             a = random.randrange(2)
-                            print(a)
+                            
                             if a==0:
                                 self.driveMotors(0.129, -0.129)
                                 self.viraDir = 1
@@ -295,18 +258,17 @@ class MyRob(CRobLinkAngs):
                                 self.driveMotors(-0.129, 0.129)
                                 self.viraEsq = 1
                         elif (self.measures.irSensor[left_id]< 1/0.72):
-                            print("so pode ir para a esquerda")
+                           
                             self.driveMotors(-0.129, 0.129)
                             self.viraEsq = 1
                         elif (self.measures.irSensor[right_id]< 1/0.72):
                             self.driveMotors(0.129, -0.129)
-                            print("so pode ir para a direita")
+                            
                             self.viraDir = 1
                         elif self.measures.irSensor[center_id] < 1/0.72:
                             self.driveMotors(0.15,0.15)
-                            print("so pode ir em frente")
-                    
-                    
+                            
+        
                             
 
             #--------------------------DESLOCAMENTO NA VERTICAL--------------------------            
@@ -323,11 +285,12 @@ class MyRob(CRobLinkAngs):
                         self.driveMotors(0.15, 0.15)
                     
                 else:   #Rato encontra-se no centro de uma nova celula (na vertical) => retirar conclusões
-                    
+                    self.contadorCiclos +=1
                     self.previousGps = [round(self.posX), round(self.posY)] #atualiza a posição anterior
                     self.driveMotors(-0.15, -0.15)
                     self.coordinates[round(self.posY)][round(self.posX)] = "X" #a posicao onde se encontra esta vazia (x)
-                    print("Posição atual X: " + str(self.posX) + " Y: " + str(self.posY))
+
+                    
                     # ---VERIFICAÇÃO DOS CENSORES---
                     # POR FLAGS NO ARRAY COM AS RESPETIVAS INFOS RETIRADAS DOS SENSORES
                     if self.measures.compass <= 100 and self.measures.compass >= 80: #se estiver virado para cima
@@ -361,48 +324,17 @@ class MyRob(CRobLinkAngs):
 
                     #verifica se é um beacon
                     if self.measures.ground >0: #significa que está em cima de um checkpoint
-                        print("posição atual " + str(round(self.posX)) +", " +str(self.posY))
+                        print("posição atual " + str(round(self.posX)) +", " +str(round(self.posY)))
                         #chamar o a* calcular o caminho, e escrever logo no ficheiro
-                        
-                        for i in range(27):
-                            for j in range(55):
-                                if str(self.coordinates[i][j]) == "-":   #verificar se é ij ou ji 
-                                    self.walls.append((i, j))
-                        self.objetivosPassados.append((round(self.posX), round(self.posY)))
+                        self.coordinates[13][28] = 'X'
+                      
+                        for i in range(len(self.coordinates)):#LINHAS
+                            for j in range(len(self.coordinates[i])):
+                                if str(self.coordinates[i][j]) == "-":
+                                    self.walls.append((j, i))
+                                
+                        self.objetivosPassados.append((round(self.posX), abs(round(self.posY))))    #adiciona ao array o checkpoint atual
                         self.objetivosPassados = list(set([i for i in self.objetivosPassados]))    #remove duplicates (para o caso de passar varias vezes no mesmo checkpoint)
-
-                        a = pf.AStar()
-                        
-                        print(self.walls)
-                        a.init_grid(56, 26, self.walls, (27, -14), (round(self.posX), round(self.posY)))
-                        path = a.solve()
-                        print(path)
-
-                        if len(self.objetivosPassados)>1: #para guardar num array a solução
-                            solucao=[]
-                            #executa o A* e imprime no ficheiro 
-                            for b in range(len(self.objetivosPassados)):
-                                if b< len(self.objetivosPassados)-1:
-                                    
-                                    a = pf.AStar()
-                                    a.init_grid(56, 28, self.walls, self.objetivosPassados[b], self.objetivosPassados[b+1])
-                                    path = a.solve()
-                                    solucao.append(path)
-                                    #print(path)
-
-                                else:    
-                                    a = pf.AStar()
-                                    a.init_grid(56, 28, self.walls, self.objetivosPassados[b], (27, 13))
-                                    path = a.solve()
-                                    solucao.append(path)
-                                    #print(path)
-                            #print("objetivos passados:  " + str(self.objetivosPassados) + "\n")
-                            #print("Solução" + str(solucao))
-                            # for x in range(len(solucao)): #ideia para imprimir(não é boa)
-                            #     if(x%2 == 0):
-                            #         print(solucao[x])
-                        
-                        
 
                     #decide para onde vai conforme valores dos sensores
                     
@@ -425,7 +357,7 @@ class MyRob(CRobLinkAngs):
                         self.reverte = 1
                     
                     else:   #As posições à volta dele já estão todas visitadas
-                        print("já visitei tudo à minha volta")
+                        #print("já visitei tudo à minha volta")
                         if (self.measures.irSensor[left_id]< 1/0.72) and (self.measures.irSensor[right_id]< 1/0.72):
                             a = random.randrange(2)
                             print(a)
@@ -443,7 +375,35 @@ class MyRob(CRobLinkAngs):
                         elif (self.measures.irSensor[right_id]< 1/0.72):
                             self.driveMotors(0.129, -0.129)
                             self.viraDir = 1
-          
+
+        if self.contadorCiclos %10 ==0:#determina A*
+            self.contadorCiclos+=1
+            if len(self.objetivosPassados)>1: #para guardar num array a solução
+                            solucao=[]
+                            #executa o A* e imprime no ficheiro 
+                            for b in range(len(self.objetivosPassados)):
+                                if b< len(self.objetivosPassados)-1:
+                                    
+                                    a = pf.AStar()
+                                    a.init_grid(56, 28, self.walls, self.objetivosPassados[b], self.objetivosPassados[b+1])
+                                    path = a.solve()
+                                    solucao.append(path)
+                                    #print(path)
+
+                                else: #para imprimir da ultima posiçaõ adicionada aos checkpoints até ao inicio   
+                                    a = pf.AStar()
+                                    a.init_grid(56, 28, self.walls, self.objetivosPassados[b], (27, 13))
+                                    path = a.solve()
+                                    solucao.append(path)
+                                    #print(path)
+                            #print("objetivos passados:  " + str(self.objetivosPassados) + "\n")
+                            print("Solução" + str(solucao))
+
+                            #for x in range(len(solucao)): #TODO OBJETIVO CADA VALOR DO PATH MENOS 23,17 E IMPRIMIR VALOR SIM VALOR NAO
+                                #if(x%2 == 0):
+                                    #print(solucao[x])
+            
+
 
 
 class Map():
