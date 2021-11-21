@@ -111,21 +111,25 @@ class MyRob(CRobLinkAngs):
 
         if self.contadorCiclos == 0: #CICLO 0
             self.contadorCiclos+=1
-            print(self.measures.x)
-            print(-self.measures.y)
             self.firstPosX =self.measures.x-27 #tirar o 3 para ficar caso geral
             self.firstPosY =self.measures.y-14 #  //  o 11       //        //
+            self.posX = 27
+            self.posY = 13
             self.previousGps = [self.measures.x - self.firstPosX, self.measures.y -self.firstPosY]
+            if self.measures.compass <= 10 and self.measures.compass >= -10: #mapeamento da posicao adjacente ao I
+                self.coordinates[round(self.posY)][round(self.posX+1)] = "X"
+            elif abs(self.measures.compass) <= 180 and abs(self.measures.compass) >= 170: 
+                self.coordinates[round(self.posY)][round(self.posX-1)] = "X"
             self.nObjetivos = int(self.nBeacons)-1    #-1 PQE O INICIO TAMBEM CONTA COMO BEACON
             
         
-        with open('map.out', 'w') as outfile: 
+        with open('path.out', 'w') as outfile: 
             for i in range(27):
                 for j in range(55):
                     outfile.write(self.coordinates[i][j])
                     #print(self.coordinates[i][j])
                 outfile.write("\n")
-        #print("\n".join(["".join([x for x in row])for row in self.coordinates]))
+        print("\n".join(["".join([x for x in row])for row in self.coordinates]))
         
         self.coordinates[13][27] = "X" #posicao inicial
         self.posX = self.measures.x-self.firstPosX #variavel que guarda a coordenada 
@@ -215,7 +219,7 @@ class MyRob(CRobLinkAngs):
                     if self.measures.ground >0: #significa que está em cima de um checkpoint
                         print("posição atual " + str(round(self.posX)) +", " +str(round(self.posY)))
                         #chamar o a* calcular o caminho, e escrever logo no ficheiro
-                        self.coordinates[13][28] = 'X'
+                        #self.coordinates[13][28] = 'X'
                       
                         for i in range(len(self.coordinates)):#LINHAS
                             for j in range(len(self.coordinates[i])):
@@ -326,7 +330,7 @@ class MyRob(CRobLinkAngs):
                     if self.measures.ground >0: #significa que está em cima de um checkpoint
                         print("posição atual " + str(round(self.posX)) +", " +str(round(self.posY)))
                         #chamar o a* calcular o caminho, e escrever logo no ficheiro
-                        self.coordinates[13][28] = 'X'
+                        #self.coordinates[13][28] = 'X'
                       
                         for i in range(len(self.coordinates)):#LINHAS
                             for j in range(len(self.coordinates[i])):
