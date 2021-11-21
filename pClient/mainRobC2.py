@@ -109,25 +109,34 @@ class MyRob(CRobLinkAngs):
 
         if self.contadorCiclos == 0:
             self.contadorCiclos+=1
-            self.firstPosX =self.measures.x-27 #tirar o 3 para ficar caso geral
-            self.firstPosY =self.measures.y-14 #  //  o 11       //        //
+            self.firstPosX =self.measures.x-27
+            self.firstPosY =self.measures.y-14
+            self.posX = 27
+            self.posY = 13
+            if self.measures.compass <= 10 and self.measures.compass >= -10:
+                self.coordinates[round(self.posY)][round(self.posX+1)] = "X"
+            elif abs(self.measures.compass) <= 180 and abs(self.measures.compass) >= 170: 
+                self.coordinates[round(self.posY)][round(self.posX-1)] = "X"
+
             self.previousGps = [self.measures.x - self.firstPosX, self.measures.y - self.firstPosY]
-            
         
         with open('map.out', 'w') as outfile: 
             for i in range(27):
                 for j in range(55):
                     outfile.write(self.coordinates[i][j])
-                    print(self.coordinates[i][j])
+                    #print(self.coordinates[i][j])
                 outfile.write("\n")
         print("\n".join(["".join([x for x in row])for row in self.coordinates]))
         
         self.coordinates[13][27] = "I" #posicao inicial
-        self.posX = self.measures.x-self.firstPosX #variavel que guarda a coordenada 
+        self.posX = self.measures.x - self.firstPosX #variavel que guarda a coordenada 
         self.posY = self.firstPosY - self.measures.y #sem ter que se estar sempre a fazer a conta
-        #print("coordenada x: ", self.posX)
-        #print("coordenada y: ", self.posY)
-        #print("compass: ", self.measures.compass)
+        
+        
+
+        # print("coordenada x: ", self.posX)
+        # print("coordenada y: ", self.posY)
+        # print("compass: ", self.measures.compass)
 
         if self.count == 6 or self.countReverte == 12:
             if self.viraEsq == 1:
@@ -177,7 +186,9 @@ class MyRob(CRobLinkAngs):
                     self.previousGps = [round(self.posX), round(self.posY)]     #atualiza a posição anterior 
                     self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
                     self.coordinates[round(self.posY)][round(self.posX)] = "X"  #a posicao onde se encontra esta vazia (x)
-                    
+                    print("coordenada x: ", round(self.posX))
+                    print("coordenada y: ", round(self.posY))  
+                    print("posY positivo: ", self.measures.y - self.firstPosY)
                     # ---VERIFICAÇÃO DOS CENSORES---
                     # POR FLAGS NO ARRAY COM AS RESPETIVAS INFOS RETIRADAS DOS SENSORES  
                     if self.measures.compass <= 10 and self.measures.compass >= -10:    #se estiver virado para norte (direita)
@@ -273,7 +284,9 @@ class MyRob(CRobLinkAngs):
                     self.previousGps = [round(self.posX), round(self.posY)] #atualiza a posição anterior
                     self.driveMotors(-0.15, -0.15)
                     self.coordinates[round(self.posY)][round(self.posX)] = "X" #a posicao onde se encontra esta vazia (x)
-                   
+                    print("coordenada x: ", round(self.posX))
+                    print("coordenada y: ", round(self.posY))  
+                    print("posY positivo: ", self.measures.y - self.firstPosY)
                     # ---VERIFICAÇÃO DOS CENSORES---
                     # POR FLAGS NO ARRAY COM AS RESPETIVAS INFOS RETIRADAS DOS SENSORES
                     if self.measures.compass <= 100 and self.measures.compass >= 80: #se estiver virado para cima
