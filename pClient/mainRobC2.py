@@ -101,11 +101,6 @@ class MyRob(CRobLinkAngs):
         back_id = 3
         lin = 0.14
 
-        #print("sensor parede da frente:", (self.measures.irSensor[center_id])) 
-        # print("sensor parede da direita:", (self.measures.irSensor[right_id]))
-        # print("sensor parede da esquerda:", (self.measures.irSensor[left_id]))
-        # print("\n")
-        #print(self.measures.compass)
 
         if self.contadorCiclos == 0:
             self.contadorCiclos+=1
@@ -126,17 +121,12 @@ class MyRob(CRobLinkAngs):
                     outfile.write(self.coordinates[i][j])
                     #print(self.coordinates[i][j])
                 outfile.write("\n")
-        print("\n".join(["".join([x for x in row])for row in self.coordinates]))
+        #print("\n".join(["".join([x for x in row])for row in self.coordinates]))
         
         self.coordinates[13][27] = "I" #posicao inicial
         self.posX = self.measures.x - self.firstPosX #variavel que guarda a coordenada 
         self.posY = self.firstPosY - self.measures.y #sem ter que se estar sempre a fazer a conta
         
-        
-
-        # print("coordenada x: ", self.posX)
-        # print("coordenada y: ", self.posY)
-        # print("compass: ", self.measures.compass)
 
         if self.count == 6 or self.countReverte == 12:
             if self.viraEsq == 1:
@@ -145,7 +135,7 @@ class MyRob(CRobLinkAngs):
                 self.driveMotors(-0.129, 0.129) 
             if self.reverte == 1:
                 self.driveMotors(-0.129, 0.129) # ou seja ele reverte para a direita
-            #print(self.measures.compass)
+            
             self.countReverte = 0
             self.reverte = 0
             self.count = 0
@@ -186,9 +176,7 @@ class MyRob(CRobLinkAngs):
                     self.previousGps = [round(self.posX), round(self.posY)]     #atualiza a posição anterior 
                     self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
                     self.coordinates[round(self.posY)][round(self.posX)] = "X"  #a posicao onde se encontra esta vazia (x)
-                    print("coordenada x: ", round(self.posX))
-                    print("coordenada y: ", round(self.posY))  
-                    print("posY positivo: ", self.measures.y - self.firstPosY)
+                    
                     # ---VERIFICAÇÃO DOS CENSORES---
                     # POR FLAGS NO ARRAY COM AS RESPETIVAS INFOS RETIRADAS DOS SENSORES  
                     if self.measures.compass <= 10 and self.measures.compass >= -10:    #se estiver virado para norte (direita)
@@ -241,11 +229,11 @@ class MyRob(CRobLinkAngs):
                         self.reverte = 1
                    
                     else:   #As posições à volta dele já estão todas visitadas
-                        print("já visitei tudo à minha volta")
+                        
                         if (self.measures.irSensor[left_id]< 1/0.72) and (self.measures.irSensor[right_id]< 1/0.72):
-                            print("pode ir para a esquerda ou direita")
+                            
                             a = random.randrange(2)
-                            print(a)
+                            
                             if a==0:
                                 self.driveMotors(0.129, -0.129)
                                 self.viraDir = 1
@@ -253,16 +241,16 @@ class MyRob(CRobLinkAngs):
                                 self.driveMotors(-0.129, 0.129)
                                 self.viraEsq = 1
                         elif (self.measures.irSensor[left_id]< 1/0.72):
-                            print("so pode ir para a esquerda")
+                            
                             self.driveMotors(-0.129, 0.129)
                             self.viraEsq = 1
                         elif (self.measures.irSensor[right_id]< 1/0.72):
                             self.driveMotors(0.129, -0.129)
-                            print("so pode ir para a direita")
+                            
                             self.viraDir = 1
                         elif self.measures.irSensor[center_id] < 1/0.72:
                             self.driveMotors(0.15,0.15)
-                            print("so pode ir em frente")
+                            
                         
                             
 
@@ -284,9 +272,7 @@ class MyRob(CRobLinkAngs):
                     self.previousGps = [round(self.posX), round(self.posY)] #atualiza a posição anterior
                     self.driveMotors(-0.15, -0.15)
                     self.coordinates[round(self.posY)][round(self.posX)] = "X" #a posicao onde se encontra esta vazia (x)
-                    print("coordenada x: ", round(self.posX))
-                    print("coordenada y: ", round(self.posY))  
-                    print("posY positivo: ", self.measures.y - self.firstPosY)
+                   
                     # ---VERIFICAÇÃO DOS CENSORES---
                     # POR FLAGS NO ARRAY COM AS RESPETIVAS INFOS RETIRADAS DOS SENSORES
                     if self.measures.compass <= 100 and self.measures.compass >= 80: #se estiver virado para cima
@@ -338,10 +324,10 @@ class MyRob(CRobLinkAngs):
                         self.reverte = 1
                     
                     else:   #As posições à volta dele já estão todas visitadas
-                        print("já visitei tudo à minha volta")
+                       
                         if (self.measures.irSensor[left_id]< 1/0.72) and (self.measures.irSensor[right_id]< 1/0.72):
                             a = random.randrange(2)
-                            print(a)
+                           
                             if a==0:
                                 self.driveMotors(0.129, -0.129)
                                 self.viraDir = 1

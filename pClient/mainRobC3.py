@@ -123,13 +123,13 @@ class MyRob(CRobLinkAngs):
             self.nObjetivos = int(self.nBeacons)-1    #-1 PQE O INICIO TAMBEM CONTA COMO BEACON
             
         
-        with open('path.out', 'w') as outfile: 
-            for i in range(27):
-                for j in range(55):
-                    outfile.write(self.coordinates[i][j])
-                    #print(self.coordinates[i][j])
-                outfile.write("\n")
-        print("\n".join(["".join([x for x in row])for row in self.coordinates]))
+        # with open('path.out', 'w') as outfile: 
+        #     for i in range(27):
+        #         for j in range(55):
+        #             outfile.write(self.coordinates[i][j])
+        #             #print(self.coordinates[i][j])
+        #         outfile.write("\n")
+        #print("\n".join(["".join([x for x in row])for row in self.coordinates]))
         
         self.coordinates[13][27] = "X" #posicao inicial
         self.posX = self.measures.x-self.firstPosX #variavel que guarda a coordenada 
@@ -217,9 +217,9 @@ class MyRob(CRobLinkAngs):
                      
                     #verifica se é um beacon
                     if self.measures.ground >0: #significa que está em cima de um checkpoint
-                        print("posição atual " + str(round(self.posX)) +", " +str(round(self.posY)))
+                        
                         #chamar o a* calcular o caminho, e escrever logo no ficheiro
-                        #self.coordinates[13][28] = 'X'
+                        
                       
                         for i in range(len(self.coordinates)):#LINHAS
                             for j in range(len(self.coordinates[i])):
@@ -328,9 +328,9 @@ class MyRob(CRobLinkAngs):
 
                     #verifica se é um beacon
                     if self.measures.ground >0: #significa que está em cima de um checkpoint
-                        print("posição atual " + str(round(self.posX)) +", " +str(round(self.posY)))
+                        
                         #chamar o a* calcular o caminho, e escrever logo no ficheiro
-                        #self.coordinates[13][28] = 'X'
+                        
                       
                         for i in range(len(self.coordinates)):#LINHAS
                             for j in range(len(self.coordinates[i])):
@@ -364,7 +364,7 @@ class MyRob(CRobLinkAngs):
                         #print("já visitei tudo à minha volta")
                         if (self.measures.irSensor[left_id]< 1/0.72) and (self.measures.irSensor[right_id]< 1/0.72):
                             a = random.randrange(2)
-                            print(a)
+                            
                             if a==0:
                                 self.driveMotors(0.129, -0.129)
                                 self.viraDir = 1
@@ -406,6 +406,9 @@ class MyRob(CRobLinkAngs):
                             #for x in range(len(solucao)): #TODO OBJETIVO CADA VALOR DO PATH MENOS 23,17 E IMPRIMIR VALOR SIM VALOR NAO
                                 #if(x%2 == 0):
                                     #print(solucao[x])
+                            with open('path.out', 'w') as outfile: 
+                                for t in solucao:
+                                        outfile.write(' '.join(str(s) for s in t) + '\n')
             
 
 

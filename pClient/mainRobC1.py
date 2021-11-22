@@ -69,64 +69,28 @@ class MyRob(CRobLinkAngs):
         right_id = 2
         back_id = 3
 
-        # if (self.measures.irSensor[left_id] <10.0 and self.measures.irSensor[left_id]>=2.0\
-        #    and self.measures.irSensor[center_id]<2.0)\
-        #    or (self.measures.irSensor[right_id] <10.0 and self.measures.irSensor[right_id]>=2.0\
-        #    and self.measures.irSensor[center_id]<2.0):     #Anda em frente
-        #     print("vai em frente")
-        #     self.driveMotors(0.15, 0.15)
+        
         if self.measures.irSensor[left_id]>= 2.9:      #caso o robot esteja demasiado perto duma parede esquerda, vai um bocado para a direita (3.33)
             self.driveMotors(0.15, 0.097)
         elif self.measures.irSensor[right_id]>= 2.9:   #caso o robot esteja demasiado perto duma parede direita, vai um bocado para a esquerda (3.33)
             self.driveMotors(0.097, 0.15)
         else:
             self.driveMotors(0.15, 0.15)
-            print("vai em frente")
-
-        if self.measures.irSensor[center_id]>=1.16:                #STOP!(1.67)
+           
+        if self.measures.irSensor[center_id]>=1.16:                #STOP!
             
-            print("stop")
-            # if self.measures.irSensor[left_id]< 1.67:              #SABE QUE TEM DE VIRAR PARA A ESQUERDA
-            #     if self.measures.irSensor[center_id]>1.0:
-                
-            #         print("vira à esquerda")
-            #         self.driveMotors(-0.15, 0.15)   #virar à esquerda
-
-            # if self.measures.irSensor[right_id]< 1.67:             #SABE QUE TEM DE VIRAR PARA A DIREITA
-            #     if self.measures.irSensor[center_id]>1.0:
-                
-            #         print("vira à direita")
-            #         self.driveMotors(0.15, -0.15)   #virar à direita
-
+            
             if (self.measures.irSensor[left_id]< self.measures.irSensor[right_id] and 
                     self.measures.irSensor[left_id] - self.measures.irSensor[right_id]<0): 
-                print("vira à esquerda")
+
                 self.driveMotors(-0.12, 0.12)   #virar à esquerda
 
             if (self.measures.irSensor[left_id]> self.measures.irSensor[right_id] and
                     self.measures.irSensor[right_id] - self.measures.irSensor[left_id]<0):
-                print("vira à direita")
+
                 self.driveMotors(0.12, -0.12)   #virar à direita
                 
         
-
-        #CÓDIGO DOS PROFS
-        # if    self.measures.irSensor[center_id] > 4.0\
-        #    or self.measures.irSensor[left_id]   > 4.0\
-        #    or self.measures.irSensor[right_id]  > 4.0\
-        #    or self.measures.irSensor[back_id]   > 4.0:
-        #     print('Rotate left')
-        #     self.driveMotors(-0.1,+0.1)
-         
-        # elif self.measures.irSensor[left_id]> 0.7:
-        #     print('Rotate slowly right')
-        #     self.driveMotors(0.1,0.0)
-        # elif self.measures.irSensor[right_id]> 0.7:
-        #     print('Rotate slowly left')
-        #     self.driveMotors(0.0,0.15)
-        # else:
-        #     print('Go')
-        #     self.driveMotors(0.15,0.15)
 
 class Map():
     def __init__(self, filename):
