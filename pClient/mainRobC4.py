@@ -150,7 +150,7 @@ class MyRob(CRobLinkAngs):
                 self.coordinates[newGPS[1]-1][newGPS[0]] = "X" #se nao tiver parede quer dizer q é vazia
 
                 if not (self.measures.irSensor[center_id] > 1.2):#se nao tiver parede em frente nem a esquerda, a casa e adicionada as visitaveis
-                    self.visitableCoord = (newGPS[0], newGPS[1]-1 ) 
+                    self.visitableCoord = (newGPS[0], newGPS[1]-2) 
                     self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
 
                 try:
@@ -163,10 +163,10 @@ class MyRob(CRobLinkAngs):
                 self.coordinates[newGPS[1]+1][newGPS[0]] = "X" #se nao tiver parede quer dizer q ta vazia
 
                 if not (self.measures.irSensor[center_id] > 1.2): #se nao tiver parede a frente nem a direita vai em frente
-                    self.visitableCoord = (newGPS[0], newGPS[1]+1)
+                    self.visitableCoord = (newGPS[0], newGPS[1]+2)
                     self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
                 elif not (self.measures.irSensor[left_id] > 1.2): #se nao tiver parede a esquerda nem a direita, vai para a esquerda logo
-                    self.visitableCoord = (newGPS[0], newGPS[1]+1) 
+                    self.visitableCoord = (newGPS[0], newGPS[1]+2) 
                     self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
 
                 try:
@@ -188,7 +188,7 @@ class MyRob(CRobLinkAngs):
                 self.coordinates[newGPS[1]+1][newGPS[0]] = "X"
 
                 if not (self.measures.irSensor[center_id] > 1.2):#se nao tiver parede em frente nem a esquerda, a casa e adicionada as visitaveis
-                    self.visitableCoord = (newGPS[0], newGPS[1]+1) 
+                    self.visitableCoord = (newGPS[0], newGPS[1]+2) 
                     self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
 
                 try:
@@ -201,10 +201,10 @@ class MyRob(CRobLinkAngs):
                 self.coordinates[newGPS[1]-1][newGPS[0]] = "X"
 
                 if not (self.measures.irSensor[center_id] > 1.2): #se nao tiver parede a frente nem a direita vai em frente
-                    self.visitableCoord = (newGPS[0], newGPS[1]-1) 
+                    self.visitableCoord = (newGPS[0], newGPS[1]-2) 
                     self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
                 elif not (self.measures.irSensor[left_id] > 1.2): #se nao tiver parede a esquerda nem a direita, vai para a esquerda logo
-                    self.visitableCoord = (newGPS[0], newGPS[1]-1) 
+                    self.visitableCoord = (newGPS[0], newGPS[1]-2) 
                     self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
 
                 try:
@@ -240,7 +240,7 @@ class MyRob(CRobLinkAngs):
                 self.coordinates[newGPS[1]][newGPS[0]-1] = "X" 
 
                 if not (self.measures.irSensor[center_id] > 1.2):#se nao tiver parede em frente nem a esquerda, a casa e adicionada as visitaveis
-                    self.visitableCoord = (newGPS[0]-1, newGPS[1]) 
+                    self.visitableCoord = (newGPS[0]-2, newGPS[1]) 
                     self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
 
                 try:
@@ -253,10 +253,10 @@ class MyRob(CRobLinkAngs):
                 self.coordinates[newGPS[1]][newGPS[0]+1] = "X"
 
                 if not (self.measures.irSensor[center_id] > 1.2): #se nao tiver parede a frente nem a direita vai em frente
-                    self.visitableCoord = (newGPS[0]+1, newGPS[1]) 
+                    self.visitableCoord = (newGPS[0]+2, newGPS[1]) 
                     self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
                 elif not (self.measures.irSensor[left_id] > 1.2): #se nao tiver parede a esquerda nem a direita, vai para a esquerda logo
-                    self.visitableCoord = (newGPS[0]+1, newGPS[1]) 
+                    self.visitableCoord = (newGPS[0]+2, newGPS[1]) 
                     self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
 
                 try:
@@ -279,7 +279,7 @@ class MyRob(CRobLinkAngs):
                 self.coordinates[newGPS[1]][newGPS[0]+1] = "X"
 
                 if not (self.measures.irSensor[center_id] > 1.2):#se nao tiver parede em frente nem a esquerda, a casa e adicionada as visitaveis
-                    self.visitableCoord = (newGPS[0]+1, newGPS[1]) 
+                    self.visitableCoord = (newGPS[0]+2, newGPS[1]) 
                     self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
 
                 try:
@@ -292,10 +292,10 @@ class MyRob(CRobLinkAngs):
                 self.coordinates[newGPS[1]][newGPS[0]-1] = "X"
 
                 if not (self.measures.irSensor[center_id] > 1.2): #se nao tiver parede a frente nem a direita vai em frente
-                    self.visitableCoord = (newGPS[0]-1, newGPS[1])
+                    self.visitableCoord = (newGPS[0]-2, newGPS[1])
                     self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
                 elif not (self.measures.irSensor[left_id] > 1.2): #se nao tiver parede a esquerda nem a direita, vai para a esquerda logo
-                    self.visitableCoord = (newGPS[0]-1, newGPS[1]) 
+                    self.visitableCoord = (newGPS[0]-2, newGPS[1]) 
                     self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
 
                 try:
