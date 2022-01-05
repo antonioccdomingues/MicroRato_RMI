@@ -127,7 +127,10 @@ class MyRob(CRobLinkAngs):
         left_id = 1
         right_id = 2
 
-        self.coordinates[newGPS[1]][newGPS[0]] = "X"  #a posicao onde se encontra esta vazia (x)
+        if newGPS[0]== 27 and newGPS[1] == 13:
+            self.coordinates[newGPS[1]][newGPS[0]] = "I"  #a posicao onde se encontra é o inicio (I)
+        else:
+            self.coordinates[newGPS[1]][newGPS[0]] = "X" #a posicao onde se encontra esta vazia (x)
         try:
             self.walls.remove((newGPS[0], newGPS[1]))
         except:
@@ -218,7 +221,10 @@ class MyRob(CRobLinkAngs):
         left_id = 1
         right_id = 2
 
-        self.coordinates[newGPS[1]][newGPS[0]] = "X" #a posicao onde se encontra esta vazia (x)
+        if newGPS[0]== 27 and newGPS[1] == 13:
+            self.coordinates[newGPS[1]][newGPS[0]] = "I"  #a posicao onde se encontra é o inicio (I)
+        else:
+            self.coordinates[newGPS[1]][newGPS[0]] = "X" #a posicao onde se encontra esta vazia (x)
         try:
             self.walls.remove((newGPS[0], newGPS[1]))
         except:
