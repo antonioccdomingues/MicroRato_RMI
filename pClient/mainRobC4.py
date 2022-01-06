@@ -366,7 +366,6 @@ class MyRob(CRobLinkAngs):
         #print("\n".join(["".join([x for x in row])for row in self.coordinates]))
 
 
-
         #-------------------------------------ROTAÇÕES---------------------------------------------------------
         if self.count == 5 or self.countReverte == 10:
             
@@ -449,7 +448,8 @@ class MyRob(CRobLinkAngs):
                         if item not in self.visitableNoRep:
                             self.visitableNoRep.append(item)
                     
-                    print(self.visitableNoRep)
+                    print("visitable: ", self.visitableNoRep)
+                    print("visited: ", self.visited)
 
                     #decide para onde vai conforme valores dos sensores
                     
@@ -480,16 +480,8 @@ class MyRob(CRobLinkAngs):
                         self.updatePreviousMotors(0, 0)
                     
                     else:   #As posições à volta dele já estão todas visitadas
-
- # if self.contadorCiclos %35 ==0:#determina A*
-        #     self.contadorCiclos+=1
-            
-        #     solucao=[]
-        #     a = pf.AStar()
-        #     a.init_grid(56, 27, self.walls, (27,13), (51,13))
-        #     path = a.solve()
-        #     print(str(self.walls) + "\n")
-        #     print(path)
+                        
+                        print("walls: ", self.walls)
 
                         a = pf.AStar()
                         
@@ -497,16 +489,16 @@ class MyRob(CRobLinkAngs):
                         print("origin: ", self.origin)
 
                         for destiny in self.visitable:
-                            print("destiny: ", destiny)
+                            print("destinyHor: ", destiny)
                             a.init_grid(56, 27, self.walls, self.origin, destiny)
                             path = a.solve()
                             print("Path: ", path)
-                            if len(path) < self.min:
-                                self.smallestPath = path
-                                self.min = len(path)
+                            if path is not None:
+                                if len(path) < self.min:
+                                    self.smallestPath = path
+                                    self.min = len(path)
                         
                         print("path: ", self.smallestPath)
-
 
                     # para acertar posição do robot 
                     if self.measures.irSensor[center_id]> 1/0.35: 
@@ -586,10 +578,8 @@ class MyRob(CRobLinkAngs):
                         if item not in self.visitableNoRep:
                             self.visitableNoRep.append(item)
                     
-                    print(self.visitableNoRep)
-                    print(self.visited)
-                    print((newGPS[0],newGPS[1]-2))
-                    print((newGPS[0],newGPS[1]+2))
+                    print("visitable: ", self.visitableNoRep)
+                    print("visited: ", self.visited)
 
                     #decide para onde vai conforme valores dos sensores
                     
@@ -621,15 +611,18 @@ class MyRob(CRobLinkAngs):
                     else:   #As posições à volta dele já estão todas visitadas
                         a = pf.AStar()
                         
-                        self.origin = (newGPS[0],newGPS[1])
-                        
+                        self.origin = (newGPS[0], newGPS[1])
+                        print("origin: ", self.origin)
 
                         for destiny in self.visitable:
+                            print("destinyVert: ", destiny)
                             a.init_grid(56, 27, self.walls, self.origin, destiny)
                             path = a.solve()
-                            
-                            if len(path) < len(self.smallestPath):
-                                self.smallestPath = path
+                            print("Path: ", path)
+                            if path is not None:
+                                if len(path) < self.min:
+                                    self.smallestPath = path
+                                    self.min = len(path)
                         
                         print("path: ", self.smallestPath)
 
