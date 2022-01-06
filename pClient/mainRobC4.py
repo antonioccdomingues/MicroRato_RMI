@@ -437,16 +437,19 @@ class MyRob(CRobLinkAngs):
                     self.previousGps[0] = round(deslocamentoX)  #atualiza a posição anterior
 
                     print(newGPS)
+
                     self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
                     l = -0.15
                     r = -0.15
                     
-                    self.visited.append((newGPS[0], newGPS[1]))
+                    if (newGPS[0], newGPS[1]) not in self.visited: #se essa casa ainda nao tiver registada como visitada, e acrescentada as casas visitadas
+                        self.visited.append((newGPS[0], newGPS[1]))
+                        
                     self.verifySensorsXX()
 
-                    for item in self.visitable:
-                        if item not in self.visitableNoRep:
-                            self.visitableNoRep.append(item)
+                    for item in self.visitable: #remove as casas visitaveis repetidas
+                        if item not in self.visitableNoRep: 
+                            self.visitableNoRep.append(item) #e guarda neste array
                     
                     print("visitable: ", self.visitableNoRep)
                     print("visited: ", self.visited)
@@ -480,25 +483,35 @@ class MyRob(CRobLinkAngs):
                         self.updatePreviousMotors(0, 0)
                     
                     else:   #As posições à volta dele já estão todas visitadas
-                        
-                        print("walls: ", self.walls)
 
                         a = pf.AStar()
                         
                         self.origin = (newGPS[0], newGPS[1])
                         print("origin: ", self.origin)
 
-                        for destiny in self.visitable:
+                        for destiny in self.visitableNoRep:
                             print("destinyHor: ", destiny)
                             a.init_grid(56, 27, self.walls, self.origin, destiny)
                             path = a.solve()
                             print("Path: ", path)
-                            if path is not None:
-                                if len(path) < self.min:
-                                    self.smallestPath = path
-                                    self.min = len(path)
+
+                            if path is None: #se ja nao conseguir calcular o path 
+                                break
+
+                            elif len(path) < self.min: #se conseguir calcular verifica se e o mais pequeno
+                                self.smallestPath = path
+                                self.min = len(path)
                         
-                        print("path: ", self.smallestPath)
+                        self.smallestPath.pop(0) #retira o ponto de partida
+                        print("smallest path: ", self.smallestPath) #smallestPath -> para fazer o joystick
+
+                        for vis in self.smallestPath: #para cada casa no smallestPath
+                            if vis in self.visitableNoRep: #se existir no array de visitaveis
+                                print("casa: ", vis)
+                                self.visitableNoRep.remove(vis) #e retirado porque ja vai ser visitada
+
+                        print("visitable sem casas visitadas: ", self.visitableNoRep)
+
 
                     # para acertar posição do robot 
                     if self.measures.irSensor[center_id]> 1/0.35: 
@@ -564,14 +577,17 @@ class MyRob(CRobLinkAngs):
                     else:                                                           #Se estiver virado para baixo
                         newGPS= [newGPS[0], newGPS[1]+2]
 
-                    print(newGPS)
                     self.previousGps[1] = round(deslocamentoY) #atualiza a posição anterior
+
+                    print(newGPS)
 
                     self.driveMotors(-0.15, -0.15)
                     l = -0.15
                     r = -0.15
                     
-                    self.visited.append((newGPS[0], newGPS[1]))
+                    if (newGPS[0], newGPS[1]) not in self.visited: #se essa casa ainda nao tiver registada como visitada, e acrescentada as casas visitadas
+                        self.visited.append((newGPS[0], newGPS[1]))
+                    
                     self.verifySensorsYY()
                     
                     for item in self.visitable:
@@ -608,23 +624,36 @@ class MyRob(CRobLinkAngs):
                         deslocamentoY = math.floor(deslocamentoY)
                         self.updatePreviousMotors(0, 0)
                     
-                    else:   #As posições à volta dele já estão todas visitadas
+                    else:   #As posições à volta dele já estão todas visitadas e ja nao ha x's por preencher
+
                         a = pf.AStar()
                         
                         self.origin = (newGPS[0], newGPS[1])
                         print("origin: ", self.origin)
 
-                        for destiny in self.visitable:
+                        for destiny in self.visitableNoRep:
                             print("destinyVert: ", destiny)
                             a.init_grid(56, 27, self.walls, self.origin, destiny)
                             path = a.solve()
                             print("Path: ", path)
-                            if path is not None:
-                                if len(path) < self.min:
-                                    self.smallestPath = path
-                                    self.min = len(path)
+                            
+                            if path is None: #se ja nao conseguir calcular o path 
+                                break
+
+                            elif len(path) < self.min: #se conseguir calcular verifica se e o mais pequeno
+                                self.smallestPath = path
+                                self.min = len(path)
                         
-                        print("path: ", self.smallestPath)
+                        self.smallestPath.pop(0) #retira o ponto de partida
+                        print("smallest path: ", self.smallestPath) #smallestPath -> para fazer o joystick
+
+                        for vis in self.smallestPath: #para cada casa no smallestPath
+                            if vis in self.visitableNoRep: #se existir no array de visitaveis
+                                print("casa: ", vis)
+                                self.visitableNoRep.remove(vis) #e retirado porque ja vai ser visitada
+
+                        print("visitable sem casas visitadas: ", self.visitableNoRep)
+
 
                     # para acertar posição do robot 
                     if self.measures.irSensor[center_id]> 1/0.35: 
