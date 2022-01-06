@@ -40,6 +40,7 @@ class MyRob(CRobLinkAngs):
         self.viraDir = 0
         self.reverte = 0
         self.countReverte = 0
+        self.andaComAstar = 0
         
         self.origin = (0,0)
         self.visitableCoord = (0,0) #coordenadas que vao ser guardadas no array visitable
@@ -331,6 +332,16 @@ class MyRob(CRobLinkAngs):
                 except:
                     pass
 
+    def updateSmallestPath(self):
+
+        if len(self.smallestPath) == 1: #se so tiver uma posição no path
+            self.smallestPath.pop(0)
+        else:                           #se tiver varias posições
+            self.smallestPath.pop(0)
+            self.smallestPath.pop(0)
+
+        if len(self.smallestPath) == 0:#se já executou todos os steps, termina de andar com o A*
+            self.andaComAstar = 0   #Para de andar com o A*
 
     def wander(self):
         
@@ -396,11 +407,11 @@ class MyRob(CRobLinkAngs):
             if(self.measures.compass >=-40 and self.measures.compass <=40) or (self.measures.compass <=-140 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=140):   #Se a bussola se encontra nestes graus entao o robot está na horizontal
 
                 if (((self.measures.compass <=-160 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=160)) and self.orientacaoX == 1):      #se está virado para sul, mas acertou a posição em norte => PARAR MAIS TARDE
-                    deslocamentoX -= 0.4
+                    deslocamentoX -= 0.395
                     self.orientacaoX = 0
                     #print("CONA 1")
                 elif self.measures.compass <= 30 and self.measures.compass >= -30 and self.orientacaoX == -1:  # se esta virado para norte, mas acertou a posição em sul => PARAR MAIS TARDE
-                    deslocamentoX -= 0.4
+                    deslocamentoX -= 0.395
                     self.orientacaoX = 0
                     #print("CONA 2")
                 elif self.orientacaoX != 0:  # se apenas acertou posição, tem de parar mais cedo
@@ -424,7 +435,7 @@ class MyRob(CRobLinkAngs):
                         self.driveMotors(0.15, 0.15)
                         l = 0.15
                         r = 0.15
-
+                    
 
                 else:   #Rato encontra-se no centro de uma nova celula (na horizontal) => retirar conclusões
                     self.contadorCiclos +=1
@@ -448,35 +459,35 @@ class MyRob(CRobLinkAngs):
                     self.verifySensorsXX()
 
                     for item in self.visitable: #remove as casas visitaveis repetidas
-                        if item not in self.visitableNoRep: 
+                        if item not in self.visitableNoRep and (item not in self.visited): 
                             self.visitableNoRep.append(item) #e guarda neste array
                     
-                    print("visitable: ", self.visitableNoRep)
-                    print("visited: ", self.visited)
+                   # print("visitable: ", self.visitableNoRep)
+                   # print("visited: ", self.visited)
 
                     #decide para onde vai conforme valores dos sensores
                     
-                    if (self.measures.irSensor[center_id]< 1/0.72 and self.measures.compass <= 10 and self.measures.compass >= -10 and (newGPS[0]+2,newGPS[1]) not in self.visited )\
-                     or (self.measures.irSensor[center_id]< 1/0.72 and (self.measures.compass > 170 or self.measures.compass < -170) and (newGPS[0]-2,newGPS[1]) not in self.visited):   #Tem a possibilidade de ir em frente pois nao existe parede e não tem parede visitada
+                    if ((self.measures.irSensor[center_id]< 1/0.72 and self.measures.compass <= 10 and self.measures.compass >= -10 and (newGPS[0]+2,newGPS[1]) not in self.visited )\
+                     or (self.measures.irSensor[center_id]< 1/0.72 and (self.measures.compass > 170 or self.measures.compass < -170) and (newGPS[0]-2,newGPS[1]) not in self.visited)) and self.andaComAstar == 0:   #Tem a possibilidade de ir em frente pois nao existe parede e não tem parede visitada
                         self.driveMotors(0.15,0.15)
                         l = 0.15
                         r = 0.15
 
-                    elif(self.measures.irSensor[left_id]< 1/0.72 and self.measures.compass <= 10 and self.measures.compass >= -10 and (newGPS[0],newGPS[1]-2) not in self.visited)\
-                     or (self.measures.irSensor[left_id]< 1/0.72 and (self.measures.compass > 170 or self.measures.compass < -170) and (newGPS[0],newGPS[1]+2) not in self.visited):     #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede e nao foi visitada
+                    elif((self.measures.irSensor[left_id]< 1/0.72 and self.measures.compass <= 10 and self.measures.compass >= -10 and (newGPS[0],newGPS[1]-2) not in self.visited)\
+                     or (self.measures.irSensor[left_id]< 1/0.72 and (self.measures.compass > 170 or self.measures.compass < -170) and (newGPS[0],newGPS[1]+2) not in self.visited)) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede e nao foi visitada
                         #self.driveMotors(-0.129, 0.129)
                         self.viraEsq = 1
                         deslocamentoX = math.floor(deslocamentoX)
                         self.updatePreviousMotors(0, 0)
 
-                    elif(self.measures.irSensor[right_id]< 1/0.72 and self.measures.compass <= 10 and self.measures.compass >= -10 and (newGPS[0],newGPS[1]+2) not in self.visited)\
-                     or (self.measures.irSensor[right_id]< 1/0.72 and (self.measures.compass > 170 or self.measures.compass < -170) and (newGPS[0],newGPS[1]-2) not in self.visited):     #Tem a possibilidade de ir para a direita pois à direita nao tem parede e nao foi visitada
+                    elif((self.measures.irSensor[right_id]< 1/0.72 and self.measures.compass <= 10 and self.measures.compass >= -10 and (newGPS[0],newGPS[1]+2) not in self.visited)\
+                     or (self.measures.irSensor[right_id]< 1/0.72 and (self.measures.compass > 170 or self.measures.compass < -170) and (newGPS[0],newGPS[1]-2) not in self.visited)) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a direita pois à direita nao tem parede e nao foi visitada
                         #self.driveMotors(0.129, -0.129)
                         self.viraDir = 1
                         deslocamentoX = math.floor(deslocamentoX)
                         self.updatePreviousMotors(0, 0)
 
-                    elif (self.measures.irSensor[right_id]>= 1/0.72 and self.measures.irSensor[center_id]>= 1/0.72 and self.measures.irSensor[left_id]>= 1/0.72):   #Está num beco, tem de inverter
+                    elif ((self.measures.irSensor[right_id]>= 1/0.72 and self.measures.irSensor[center_id]>= 1/0.72 and self.measures.irSensor[left_id]>= 1/0.72)) and self.andaComAstar == 0:   #Está num beco, tem de inverter
                         #self.driveMotors(0.129, -0.129)
                         self.reverte = 1
                         deslocamentoX = math.floor(deslocamentoX)
@@ -484,33 +495,118 @@ class MyRob(CRobLinkAngs):
                     
                     else:   #As posições à volta dele já estão todas visitadas
 
-                        a = pf.AStar()
+                        if self.andaComAstar == 0:#se ainda nao estiver a andar com o A*, ainda nao precisa de executar o codigo deste if
+                            print("executa a* para descobrir pos a visitar ")
+                            a = pf.AStar()
+                            self.origin = (newGPS[0], newGPS[1])
+                            #print("origin: ", self.origin)
                         
-                        self.origin = (newGPS[0], newGPS[1])
-                        print("origin: ", self.origin)
+                            destiny = self.visitableNoRep[0]
+                            #print(self.visitableNoRep)
+                            #print(self.walls)
+                            #print("destiny:", destiny)
+                            a.init_grid(56, 27, self.walls, self.origin, (destiny))
+                            self.smallestPath = a.solve()
+                            # for destiny in self.visitableNoRep:
+                            #     #print("destinyHor: ", destiny)
+                            #     a.init_grid(56, 27, self.walls, self.origin, destiny)
+                            #     path = a.solve()
+                            #     #print("Path: ", path)
 
-                        for destiny in self.visitableNoRep:
-                            print("destinyHor: ", destiny)
-                            a.init_grid(56, 27, self.walls, self.origin, destiny)
-                            path = a.solve()
-                            print("Path: ", path)
+                            #     if path is None: #se ja nao conseguir calcular o path 
+                            #         break
 
-                            if path is None: #se ja nao conseguir calcular o path 
-                                break
+                            #     elif len(path) < self.min: #se conseguir calcular verifica se e o mais pequeno
+                            #         self.smallestPath = path
+                            #         self.andaComAstar = 1
+                            #         self.min = len(path)
+                            self.andaComAstar = 1
+                            self.smallestPath.pop(0) #retira o ponto de partida
+                            self.smallestPath.pop(0) #retira tambem a seguinte
+                            #print("smallest path: ", self.smallestPath) #smallestPath -> para fazer o joystick
 
-                            elif len(path) < self.min: #se conseguir calcular verifica se e o mais pequeno
-                                self.smallestPath = path
-                                self.min = len(path)
-                        
-                        self.smallestPath.pop(0) #retira o ponto de partida
-                        print("smallest path: ", self.smallestPath) #smallestPath -> para fazer o joystick
+                        if len(self.smallestPath) != 0:
+                            #print("pos atual" + str(newGPS))
+                            #print("casa a visitar" + str(self.smallestPath[len(self.smallestPath)-1]))
+                            #print(self.smallestPath)
+                            primeiraCoordenada = self.smallestPath[0]
+                            #print("smallest path: " + str(self.smallestPath))
+                            joystick = (newGPS[0] -primeiraCoordenada[0], newGPS[1] -primeiraCoordenada[1])
+                            #print("joystick" + str(joystick))
+                            
+                            if self.measures.compass <= 30 and self.measures.compass >= -30: #se virado para a direita
+                                if(joystick == (-2,0)):
+                                    #print("vai em frente")
+                                    self.driveMotors(0.15,0.15)
+                                    l = 0.15
+                                    r = 0.15
+                                    self.updateSmallestPath()
+
+                                elif(joystick == (2,0)):
+                                    #print("Reverte E vai em frente")
+                                    self.reverte = 1
+                                    deslocamentoX = math.floor(deslocamentoX)
+                                    self.updatePreviousMotors(0, 0)
+                                    #fica virado para a esquerda
+                                    self.updateSmallestPath()
+
+                                elif (joystick == (0,2)):
+                                    print("vira esquerda E vai em frente")
+                                    self.viraEsq = 1
+                                    deslocamentoX = math.floor(deslocamentoX)
+                                    self.updatePreviousMotors(0, 0)
+                                    #atenção que ele aqui entra no if da vertical
+                                    self.updateSmallestPath()
+
+                                elif (joystick == (0,-2)):
+                                    print("vira direita E vai em frente")
+                                    self.viraDir = 1
+                                    deslocamentoX = math.floor(deslocamentoX)
+                                    self.updatePreviousMotors(0, 0)
+                                    #atenção que ele aqui entra no if da vertical
+                                    self.updateSmallestPath()
+
+                            else: #se esta virado para a esquerda
+
+                                if(joystick == (2,0) ):
+                                    print("vai em frente")
+                                    self.driveMotors(0.15,0.15)
+                                    l = 0.15
+                                    r = 0.15
+                                    self.updateSmallestPath()
+
+                                elif(joystick == (-2,0)):
+                                    print("Reverte E vai em frente")
+                                    self.reverte = 1
+                                    deslocamentoX = math.floor(deslocamentoX)
+                                    self.updatePreviousMotors(0, 0)
+                                    #fica virado para a direita
+                                    self.updateSmallestPath()
+
+                                elif (joystick == (0,2)):
+                                    print("vira esquerda se virado para a direita E vai em frente")
+                                    self.viraDir = 1
+                                    deslocamentoX = math.floor(deslocamentoX)
+                                    self.updatePreviousMotors(0, 0)
+                                    #atenção que ele aqui entra no if da vertical
+                                    self.updateSmallestPath()
+
+                                elif (joystick == (0,-2)):
+                                    print("vira direita se virado para a direita E vai em frente")
+                                    self.viraEsq = 1
+                                    deslocamentoX = math.floor(deslocamentoX)
+                                    self.updatePreviousMotors(0, 0)
+                                    #atenção que ele aqui entra no if da vertical
+                                    self.updateSmallestPath()
+
+
 
                         for vis in self.smallestPath: #para cada casa no smallestPath
                             if vis in self.visitableNoRep: #se existir no array de visitaveis
-                                print("casa: ", vis)
+                                #print("casa: ", vis)
                                 self.visitableNoRep.remove(vis) #e retirado porque ja vai ser visitada
 
-                        print("visitable sem casas visitadas: ", self.visitableNoRep)
+                        #print("visitable sem casas visitadas: ", self.visitableNoRep)
 
 
                     # para acertar posição do robot 
@@ -539,11 +635,11 @@ class MyRob(CRobLinkAngs):
             elif (self.measures.compass >=60 and self.measures.compass <=120) or (self.measures.compass >=-120 and self.measures.compass <=-60):  #encontra-se na vertical   
 
                 if self.measures.compass >=-120 and self.measures.compass <=-60 and self.orientacaoY == 1:      #se está virado para baixo, mas acertou a posição em cima => PARAR MAIS TARDE
-                    deslocamentoY -= 0.4
+                    deslocamentoY -= 0.395
                     self.orientacaoY = 0
 
                 elif self.measures.compass >=60 and self.measures.compass <=120 and self.orientacaoY == -1:  # se esta virado para cima, mas acertou a posição em baixo => PARAR MAIS TARDE
-                    deslocamentoY -= 0.4
+                    deslocamentoY -= 0.395
                     self.orientacaoY = 0
 
                 elif self.orientacaoY != 0:  # se apenas acertou posição, tem de parar mais cedo
@@ -591,68 +687,151 @@ class MyRob(CRobLinkAngs):
                     self.verifySensorsYY()
                     
                     for item in self.visitable:
-                        if item not in self.visitableNoRep:
+                        if item not in self.visitableNoRep and (item not in self.visited):
                             self.visitableNoRep.append(item)
                     
-                    print("visitable: ", self.visitableNoRep)
-                    print("visited: ", self.visited)
+                    #print("visitable: ", self.visitableNoRep)
+                    #print("visited: ", self.visited)
 
                     #decide para onde vai conforme valores dos sensores
                     
-                    if (self.measures.irSensor[center_id]< 1/0.72 and self.measures.compass <= 100 and self.measures.compass >= 80 and (newGPS[0],newGPS[1]-2) not in self.visited)\
-                     or (self.measures.irSensor[center_id]< 1/0.72 and (self.measures.compass > -100 and self.measures.compass < -80) and (newGPS[0],newGPS[1]+2) not in self.visited):   #Tem a possibilidade de ir em frente pois nao existe parede e não foi visitada
+                    if ((self.measures.irSensor[center_id]< 1/0.72 and self.measures.compass <= 100 and self.measures.compass >= 80 and (newGPS[0],newGPS[1]-2) not in self.visited)\
+                     or (self.measures.irSensor[center_id]< 1/0.72 and (self.measures.compass > -100 and self.measures.compass < -80) and (newGPS[0],newGPS[1]+2) not in self.visited)) and self.andaComAstar == 0:   #Tem a possibilidade de ir em frente pois nao existe parede e não foi visitada
                         self.driveMotors(0.15,0.15)
                         l = 0.15
                         r = 0.15
 
-                    elif(self.measures.irSensor[left_id]< 1/0.72 and self.measures.compass <= 100 and self.measures.compass >= 80 and (newGPS[0]-2,newGPS[1]) not in self.visited)\
-                     or (self.measures.irSensor[left_id]< 1/0.72 and (self.measures.compass > -100 and self.measures.compass < -80) and (newGPS[0]+2,newGPS[1]) not in self.visited):     #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede e nao foi visitada
+                    elif((self.measures.irSensor[left_id]< 1/0.72 and self.measures.compass <= 100 and self.measures.compass >= 80 and (newGPS[0]-2,newGPS[1]) not in self.visited)\
+                     or (self.measures.irSensor[left_id]< 1/0.72 and (self.measures.compass > -100 and self.measures.compass < -80) and (newGPS[0]+2,newGPS[1]) not in self.visited)) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede e nao foi visitada
                         
                         self.viraEsq = 1
                         deslocamentoY = math.floor(deslocamentoY)
+                        self.updatePreviousMotors(0, 0)
 
-                    elif(self.measures.irSensor[right_id]< 1/0.72 and self.measures.compass <= 100 and self.measures.compass >= 80 and (newGPS[0]+2,newGPS[1]) not in self.visited)\
-                     or (self.measures.irSensor[right_id]< 1/0.72 and (self.measures.compass > -100 and self.measures.compass < -80) and (newGPS[0]-2,newGPS[1]) not in self.visited):     #Tem a possibilidade de ir para a direita pois à direita nao tem parede e nao foi visitada
+                    elif((self.measures.irSensor[right_id]< 1/0.72 and self.measures.compass <= 100 and self.measures.compass >= 80 and (newGPS[0]+2,newGPS[1]) not in self.visited)\
+                     or (self.measures.irSensor[right_id]< 1/0.72 and (self.measures.compass > -100 and self.measures.compass < -80) and (newGPS[0]-2,newGPS[1]) not in self.visited)) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a direita pois à direita nao tem parede e nao foi visitada
                         
                         self.viraDir = 1
                         deslocamentoY = math.floor(deslocamentoY)
                         self.updatePreviousMotors(0, 0)
 
-                    elif (self.measures.irSensor[right_id]>= 1/0.72 and self.measures.irSensor[center_id]>= 1/0.72 and self.measures.irSensor[left_id]>= 1/0.72):   #Está num beco, tem de inverter
+                    elif ((self.measures.irSensor[right_id]>= 1/0.72 and self.measures.irSensor[center_id]>= 1/0.72 and self.measures.irSensor[left_id]>= 1/0.72)) and self.andaComAstar == 0:   #Está num beco, tem de inverter
                         
                         self.reverte = 1
                         deslocamentoY = math.floor(deslocamentoY)
                         self.updatePreviousMotors(0, 0)
                     
                     else:   #As posições à volta dele já estão todas visitadas e ja nao ha x's por preencher
-
-                        a = pf.AStar()
-                        
-                        self.origin = (newGPS[0], newGPS[1])
-                        print("origin: ", self.origin)
-
-                        for destiny in self.visitableNoRep:
-                            print("destinyVert: ", destiny)
-                            a.init_grid(56, 27, self.walls, self.origin, destiny)
-                            path = a.solve()
-                            print("Path: ", path)
+                        if self.andaComAstar == 0:  #se ainda nao estiver a andar com o A*, ainda nao precisa de executar o codigo deste if
+                            a = pf.AStar()
                             
-                            if path is None: #se ja nao conseguir calcular o path 
-                                break
+                            self.origin = (newGPS[0], newGPS[1])
+                            #print("origin: ", self.origin)
+                            destiny = self.visitableNoRep[0]
+                            
+                            a.init_grid(56, 27, self.walls, self.origin, destiny)
+                            self.smallestPath = a.solve()
 
-                            elif len(path) < self.min: #se conseguir calcular verifica se e o mais pequeno
-                                self.smallestPath = path
-                                self.min = len(path)
-                        
-                        self.smallestPath.pop(0) #retira o ponto de partida
-                        print("smallest path: ", self.smallestPath) #smallestPath -> para fazer o joystick
+                            # for destiny in self.visitableNoRep:
+                            #     #print("destinyVert: ", destiny)
+                            #     a.init_grid(56, 27, self.walls, self.origin, destiny)
+                            #     path = a.solve()
+                            #     #print("Path: ", path)
+                                
+                            #     if path is None: #se ja nao conseguir calcular o path 
+                            #         break
+
+                            #     elif len(path) < self.min: #se conseguir calcular verifica se e o mais pequeno
+                            #         self.smallestPath = path
+                            #         self.min = len(path)
+                            self.andaComAstar = 1
+                            self.smallestPath.pop(0) #retira o ponto de partida
+                            self.smallestPath.pop(0) #retira tambem a seguinte
+                            #print("smallest path: ", self.smallestPath) #smallestPath -> para fazer o joystick
+
+
+                        if len(self.smallestPath) != 0:
+                            #print("pos atual" + str(newGPS))
+                            #print("casa a visitar" + str(self.smallestPath[len(self.smallestPath)-1]))
+                            #print(self.smallestPath)
+                            primeiraCoordenada = self.smallestPath[0]
+                            joystick = (newGPS[0] -primeiraCoordenada[0], newGPS[1] -primeiraCoordenada[1])
+                            #print("joystick" + str(joystick))
+
+                            if self.measures.compass <= 120 and self.measures.compass >= 60: #se virado para cima
+                                if(joystick == (0,2)):
+                                    #print("vai em frente")
+                                    self.driveMotors(0.15,0.15)
+                                    l = 0.15
+                                    r = 0.15
+                                    self.updateSmallestPath()
+
+                                elif(joystick == (0,-2)):
+                                    #print("Reverte E vai em frente")
+                                    self.reverte = 1
+                                    deslocamentoY = math.floor(deslocamentoY)
+                                    self.updatePreviousMotors(0, 0)
+                                    #fica virado para a esquerda
+                                    self.updateSmallestPath()
+
+                                elif (joystick == (2,0)):
+                                    #print("vira esquerda E vai em frente")
+                                    self.viraEsq = 1
+                                    self.updateSmallestPath()
+                                    
+                                    deslocamentoY = math.floor(deslocamentoY)
+                                    self.updatePreviousMotors(0, 0)
+                                    #atenção que ele aqui entra no if da vertical
+
+                                elif (joystick == (-2,0)):
+                                    #print("vira direita E vai em frente")
+                                    self.viraDir = 1                                   
+                                    deslocamentoY = math.floor(deslocamentoY)
+                                    self.updatePreviousMotors(0, 0)
+                                    #atenção que ele aqui entra no if da vertical
+                                    self.updateSmallestPath()
+
+                            else: #se esta virado para baixo
+
+                                if(joystick == (0,-2)):
+                                    #print("vai em frente")
+                                    self.driveMotors(0.15,0.15)
+                                    l = 0.15
+                                    r = 0.15
+                                    self.updateSmallestPath()
+
+                                elif(joystick == (0,2)):
+                                    #print("Reverte E vai em frente")
+                                    self.reverte = 1
+                                    deslocamentoY = math.floor(deslocamentoY)
+                                    self.updatePreviousMotors(0, 0)
+                                    #fica virado para a direita
+                                    self.updateSmallestPath()
+
+                                elif (joystick == (-2,0)):
+                                    #print("vira esquerda E vai em frente")
+                                    self.viraEsq = 1
+                                    deslocamentoY = math.floor(deslocamentoY)
+                                    self.updatePreviousMotors(0, 0)
+                                    #atenção que ele aqui entra no if da vertical
+                                    self.updateSmallestPath()
+
+                                elif (joystick == (2,0)):
+                                    #print("vira direita E vai em frente")
+                                    self.viraDir = 1
+                                    
+                                    deslocamentoY = math.floor(deslocamentoY)
+                                    self.updatePreviousMotors(0, 0)
+                                    #atenção que ele aqui entra no if da vertical
+                                    self.updateSmallestPath()
+
 
                         for vis in self.smallestPath: #para cada casa no smallestPath
                             if vis in self.visitableNoRep: #se existir no array de visitaveis
-                                print("casa: ", vis)
+                                #print("casa: ", vis)
                                 self.visitableNoRep.remove(vis) #e retirado porque ja vai ser visitada
 
-                        print("visitable sem casas visitadas: ", self.visitableNoRep)
+                        #print("visitable sem casas visitadas: ", self.visitableNoRep)
 
 
                     # para acertar posição do robot 
