@@ -19,18 +19,20 @@ class MyRob(CRobLinkAngs):
     global previousPowerR
     global previousPowerL
     global newGPS
+    global valorCorrigir
 
     global arrayPotencias
     arrayPotencias = [0.131, 0.131, 0.131, 0.131, 0.131 ] 
 
     global arrayPotenciasReverte
-    arrayPotenciasReverte = [0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.1287] 
+    arrayPotenciasReverte = [0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.129] 
 
     newGPS = [27, 13]   #coordenadas iniciais do gps
     previousPowerR = 0
     previousPowerL = 0
     deslocamentoX = 27
     deslocamentoY = 13
+    valorCorrigir = 0
     
     
     def __init__(self, rob_name, rob_id, angles, host):
@@ -352,6 +354,7 @@ class MyRob(CRobLinkAngs):
         global arrayPotencias
         global newGPS
         global arrayPotenciasReverte
+        global valorCorrigir
 
         center_id = 0
         left_id = 1
@@ -376,7 +379,7 @@ class MyRob(CRobLinkAngs):
                     outfile.write(self.coordinates[i][j])
                     #print(self.coordinates[i][j])
                 outfile.write("\n")
-        #print("\n".join(["".join([x for x in row])for row in self.coordinates]))
+        print("\n".join(["".join([x for x in row])for row in self.coordinates]))
 
 
         #-------------------------------------ROTAÇÕES---------------------------------------------------------
@@ -409,10 +412,10 @@ class MyRob(CRobLinkAngs):
             if(self.measures.compass >=-40 and self.measures.compass <=40) or (self.measures.compass <=-140 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=140):   #Se a bussola se encontra nestes graus entao o robot está na horizontal
 
                 if (((self.measures.compass <=-160 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=160)) and self.orientacaoX == 1):      #se está virado para sul, mas acertou a posição em norte => PARAR MAIS TARDE
-                    deslocamentoX -= 0.395
+                    deslocamentoX -= valorCorrigir
                     self.orientacaoX = 0
                 elif self.measures.compass <= 30 and self.measures.compass >= -30 and self.orientacaoX == -1:  # se esta virado para norte, mas acertou a posição em sul => PARAR MAIS TARDE
-                    deslocamentoX -= 0.395
+                    deslocamentoX -= valorCorrigir
                     self.orientacaoX = 0
                 elif self.orientacaoX != 0:  # se apenas acertou posição, tem de parar mais cedo
                     deslocamentoX += 0.2
@@ -422,11 +425,11 @@ class MyRob(CRobLinkAngs):
                 if (abs(d_x) < 2.0):  #Se a diferença entre a pos atual e anterior<2 apenas anda em frente pois não é o meio da célula
                     
                     #CÓDIGO PARA ORIENTAR O RATO NA HORIZONTAL COM A BUSSOLA PARA NAO ANDAR AOS S's (nao precisas de mexer aqui)
-                    if (self.measures.compass >= -4 and self.measures.compass <0) or (self.measures.compass>= 176 and self.measures.compass<180):   #esta ligeiramente inclinado para a direita
+                    if (self.measures.compass >= -10 and self.measures.compass <0) or (self.measures.compass>= 170 and self.measures.compass<180):   #esta ligeiramente inclinado para a direita
                         self.driveMotors(0.13, 0.15)
                         l = 0.13
                         r = 0.15
-                    elif (self.measures.compass <=4 and self.measures.compass > 0) or (self.measures.compass> -180 and self.measures.compass<=-176):  #esta ligeiramente inclinado para a esquerda 
+                    elif (self.measures.compass <=10 and self.measures.compass > 0) or (self.measures.compass> -180 and self.measures.compass<=-170):  #esta ligeiramente inclinado para a esquerda 
                         self.driveMotors(0.15, 0.13)
                         l = 0.15
                         r = 0.13
@@ -455,7 +458,7 @@ class MyRob(CRobLinkAngs):
                     
                         
                     
-                    print(self.visitable)
+                    #print(self.visitable)
 
                     # for item in self.visitable: #remove as casas visitaveis repetidas
                     #     if item not in self.visitableNoRep and (item not in self.visited): 
@@ -584,7 +587,8 @@ class MyRob(CRobLinkAngs):
                         self.visitable.remove((newGPS[0], newGPS[1]))
                     # para acertar posição do robot 
                     if self.measures.irSensor[center_id]> 1/0.35: 
-                        
+
+                        valorCorrigir = 0.55 -(1/self.measures.irSensor[center_id])
                         if self.measures.compass <= 10 and self.measures.compass >= -10:    #se estiver virado para norte
                             self.orientacaoX = 1
                         elif (self.measures.compass <=-170 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=170):   #se estiver virado para sul
@@ -606,11 +610,11 @@ class MyRob(CRobLinkAngs):
             elif (self.measures.compass >=60 and self.measures.compass <=120) or (self.measures.compass >=-120 and self.measures.compass <=-60):  #encontra-se na vertical   
 
                 if self.measures.compass >=-120 and self.measures.compass <=-60 and self.orientacaoY == 1:      #se está virado para baixo, mas acertou a posição em cima => PARAR MAIS TARDE
-                    deslocamentoY -= 0.395
+                    deslocamentoY -= valorCorrigir
                     self.orientacaoY = 0
 
                 elif self.measures.compass >=60 and self.measures.compass <=120 and self.orientacaoY == -1:  # se esta virado para cima, mas acertou a posição em baixo => PARAR MAIS TARDE
-                    deslocamentoY -= 0.395
+                    deslocamentoY -= valorCorrigir 
                     self.orientacaoY = 0
 
                 elif self.orientacaoY != 0:  # se apenas acertou posição, tem de parar mais cedo
@@ -622,11 +626,11 @@ class MyRob(CRobLinkAngs):
                 if ( abs(d_y) < 2.0):  #Se a diferença entre a pos atual e anterior<2 apenas anda em frente pois não é o meio da célula
                     
                     #CÓDIGO PARA ORIENTAR O RATO NA VERTICAL COM A BUSSOLA PARA NAO ANDAR AOS S's (nao precisas de mexer aqui)
-                    if (self.measures.compass >= 86 and self.measures.compass <90) or (self.measures.compass<-90 and self.measures.compass>=-94):   #esta ligeiramente inclinado para a direita
+                    if (self.measures.compass >= 80 and self.measures.compass <90) or (self.measures.compass<-90 and self.measures.compass>=-100):   #esta ligeiramente inclinado para a direita
                         self.driveMotors(0.13, 0.15)
                         l = 0.13
                         r = 0.15
-                    elif (self.measures.compass <=94 and self.measures.compass > 90) or (self.measures.compass<= -86 and self.measures.compass>-90):  #esta ligeiramente inclinado para a esquerda 
+                    elif (self.measures.compass <=100 and self.measures.compass > 90) or (self.measures.compass<= -80 and self.measures.compass>-90):  #esta ligeiramente inclinado para a esquerda 
                         self.driveMotors(0.15, 0.13)
                         l = 0.15
                         r = 0.13
@@ -650,7 +654,7 @@ class MyRob(CRobLinkAngs):
                     r = -0.15
                     
                     
-                    print(self.visitable)
+                    #print(self.visitable)
                     # for item in self.visitable:
                     #     if item not in self.visitableNoRep and (item not in self.visited):
                     #         self.visitableNoRep.append(item)
@@ -769,6 +773,7 @@ class MyRob(CRobLinkAngs):
                         self.visitable.remove((newGPS[0], newGPS[1]))
                     # para acertar posição do robot 
                     if self.measures.irSensor[center_id]> 1/0.35: #se estiver muito perto de uma parede corrige pos
+                        valorCorrigir = 0.55 -(1/self.measures.irSensor[center_id])
                         if self.measures.compass >=60 and self.measures.compass <=120:    #se estiver virado para cima
                             self.orientacaoY = 1
                         elif self.measures.compass >=-120 and self.measures.compass <=-60:   #se estiver virado para baixo
@@ -781,8 +786,8 @@ class MyRob(CRobLinkAngs):
                     deslocamentoY += self.mediaCoordenadas  #determinação do deslocamento horizontal(incrementa sempre)
                     self.updatePreviousMotors(l, r) #atualiza as potencias dos motores da itereção anterior (para se usar na prox iteração e fzr a média)
         
-        # if self.contadorCiclos>10 and len(self.visitable) == 0:#chamar o finish
-        #     print("chamar o finish")
+        if self.contadorCiclos>10 and len(self.visitable) == 0:#chamar o finish
+            print("chamar o finish")
         #     # self.finish(self)
        
 class Map():
