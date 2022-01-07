@@ -24,7 +24,7 @@ class MyRob(CRobLinkAngs):
     arrayPotencias = [0.131, 0.131, 0.131, 0.131, 0.131 ] 
 
     global arrayPotenciasReverte
-    arrayPotenciasReverte = [0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.131] 
+    arrayPotenciasReverte = [0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.1287] 
 
     newGPS = [27, 13]   #coordenadas iniciais do gps
     previousPowerR = 0
@@ -160,11 +160,11 @@ class MyRob(CRobLinkAngs):
                 self.coordinates[newGPS[1]-1][newGPS[0]] = "-"
             else:
                 self.coordinates[newGPS[1]-1][newGPS[0]] = "X" #se nao tiver parede quer dizer q é vazia
-                self.coordinates[newGPS[1]-2][newGPS[0]] = "X" #se nao tiver parede quer dizer q é vazia
-                if not (self.measures.irSensor[center_id] > 1.2):#se nao tiver parede em frente nem a esquerda, a casa e adicionada as visitaveis
+                
+                if (not (self.measures.irSensor[center_id] > 1.2)) and self.coordinates[newGPS[1]-2][newGPS[0]] == " ":#se nao tiver parede em frente nem a esquerda, a casa e adicionada as visitaveis
                     self.visitableCoord = (newGPS[0], newGPS[1]-2) 
                     self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
-
+                self.coordinates[newGPS[1]-2][newGPS[0]] = "X" #se nao tiver parede quer dizer q é vazia
                 try:
                     self.walls.remove((newGPS[0], newGPS[1]-1))
                     self.walls.remove((newGPS[0], newGPS[1]-2))
@@ -174,14 +174,15 @@ class MyRob(CRobLinkAngs):
                 self.coordinates[newGPS[1]+1][newGPS[0]] = "-"
             else: 
                 self.coordinates[newGPS[1]+1][newGPS[0]] = "X" #se nao tiver parede quer dizer q ta vazia
-                self.coordinates[newGPS[1]+2][newGPS[0]] = "X" #se nao tiver parede quer dizer q ta vazia
+                
 
-                if not (self.measures.irSensor[center_id] > 1.2): #se nao tiver parede a frente nem a direita vai em frente
+                if (not (self.measures.irSensor[center_id] > 1.2)) and self.coordinates[newGPS[1]+2][newGPS[0]] == " ": #se nao tiver parede a frente nem a direita vai em frente
                     self.visitableCoord = (newGPS[0], newGPS[1]+2)
                     self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
-                elif not (self.measures.irSensor[left_id] > 1.2): #se nao tiver parede a esquerda nem a direita, vai para a esquerda logo
+                elif (not (self.measures.irSensor[left_id] > 1.2)) and self.coordinates[newGPS[1]+2][newGPS[0]] == " ": #se nao tiver parede a esquerda nem a direita, vai para a esquerda logo
                     self.visitableCoord = (newGPS[0], newGPS[1]+2) 
                     self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
+                self.coordinates[newGPS[1]+2][newGPS[0]] = "X" #se nao tiver parede quer dizer q ta vazia
 
                 try:
                     self.walls.remove((newGPS[0], newGPS[1]+1))
@@ -203,11 +204,11 @@ class MyRob(CRobLinkAngs):
                 self.coordinates[newGPS[1]+1][newGPS[0]] = "-"
             else:
                 self.coordinates[newGPS[1]+1][newGPS[0]] = "X"
-                self.coordinates[newGPS[1]+2][newGPS[0]] = "X"
-                if not (self.measures.irSensor[center_id] > 1.2):#se nao tiver parede em frente nem a esquerda, a casa e adicionada as visitaveis
+                
+                if (not (self.measures.irSensor[center_id] > 1.2)) and self.coordinates[newGPS[1]+2][newGPS[0]] == " ":#se nao tiver parede em frente nem a esquerda, a casa e adicionada as visitaveis
                     self.visitableCoord = (newGPS[0], newGPS[1]+2) 
                     self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
-
+                self.coordinates[newGPS[1]+2][newGPS[0]] = "X"
                 try:
                     self.walls.remove((newGPS[0], newGPS[1]+1))
                     self.walls.remove((newGPS[0], newGPS[1]+2))
@@ -217,14 +218,14 @@ class MyRob(CRobLinkAngs):
                 self.coordinates[newGPS[1]-1][newGPS[0]] = "-"
             else:  
                 self.coordinates[newGPS[1]-1][newGPS[0]] = "X"
+                
+                if (not (self.measures.irSensor[center_id] > 1.2)) and self.coordinates[newGPS[1]-2][newGPS[0]] == " ": #se nao tiver parede a frente nem a direita vai em frente
+                    self.visitableCoord = (newGPS[0], newGPS[1]-2) 
+                    self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
+                elif (not (self.measures.irSensor[left_id] > 1.2)) and self.coordinates[newGPS[1]-2][newGPS[0]] == " ": #se nao tiver parede a esquerda nem a direita, vai para a esquerda logo
+                    self.visitableCoord = (newGPS[0], newGPS[1]-2) 
+                    self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
                 self.coordinates[newGPS[1]-2][newGPS[0]] = "X"
-                if not (self.measures.irSensor[center_id] > 1.2): #se nao tiver parede a frente nem a direita vai em frente
-                    self.visitableCoord = (newGPS[0], newGPS[1]-2) 
-                    self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
-                elif not (self.measures.irSensor[left_id] > 1.2): #se nao tiver parede a esquerda nem a direita, vai para a esquerda logo
-                    self.visitableCoord = (newGPS[0], newGPS[1]-2) 
-                    self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
-
                 try:
                     self.walls.remove((newGPS[0], newGPS[1]-1))
                     self.walls.remove((newGPS[0], newGPS[1]-2))
@@ -262,11 +263,11 @@ class MyRob(CRobLinkAngs):
                 self.coordinates[newGPS[1]][newGPS[0]-1] = "|"
             else:
                 self.coordinates[newGPS[1]][newGPS[0]-1] = "X" 
-                self.coordinates[newGPS[1]][newGPS[0]-2] = "X"
-                if not (self.measures.irSensor[center_id] > 1.2):#se nao tiver parede em frente nem a esquerda, a casa e adicionada as visitaveis
+                
+                if (not (self.measures.irSensor[center_id] > 1.2)) and self.coordinates[newGPS[1]][newGPS[0]-2] == " ":#se nao tiver parede em frente nem a esquerda, a casa e adicionada as visitaveis
                     self.visitableCoord = (newGPS[0]-2, newGPS[1]) 
                     self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
-
+                self.coordinates[newGPS[1]][newGPS[0]-2] = "X"
                 try:
                     self.walls.remove((newGPS[0]-1, newGPS[1]))
                     self.walls.remove((newGPS[0]-2, newGPS[1]))
@@ -276,14 +277,14 @@ class MyRob(CRobLinkAngs):
                 self.coordinates[newGPS[1]][newGPS[0]+1] = "|"
             else:
                 self.coordinates[newGPS[1]][newGPS[0]+1] = "X"
+                
+                if (not (self.measures.irSensor[center_id] > 1.2)) and self.coordinates[newGPS[1]][newGPS[0]+2] == " ": #se nao tiver parede a frente nem a direita vai em frente
+                    self.visitableCoord = (newGPS[0]+2, newGPS[1]) 
+                    self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
+                elif (not (self.measures.irSensor[left_id] > 1.2)) and self.coordinates[newGPS[1]][newGPS[0]+2] == " ": #se nao tiver parede a esquerda nem a direita, vai para a esquerda logo
+                    self.visitableCoord = (newGPS[0]+2, newGPS[1]) 
+                    self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
                 self.coordinates[newGPS[1]][newGPS[0]+2] = "X"
-                if not (self.measures.irSensor[center_id] > 1.2): #se nao tiver parede a frente nem a direita vai em frente
-                    self.visitableCoord = (newGPS[0]+2, newGPS[1]) 
-                    self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
-                elif not (self.measures.irSensor[left_id] > 1.2): #se nao tiver parede a esquerda nem a direita, vai para a esquerda logo
-                    self.visitableCoord = (newGPS[0]+2, newGPS[1]) 
-                    self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
-
                 try:
                     self.walls.remove((newGPS[0]+1, newGPS[1]))
                     self.walls.remove((newGPS[0]+2, newGPS[1]))
@@ -305,11 +306,11 @@ class MyRob(CRobLinkAngs):
                 self.coordinates[newGPS[1]][newGPS[0]+1] = "|"
             else:
                 self.coordinates[newGPS[1]][newGPS[0]+1] = "X"
-                self.coordinates[newGPS[1]][newGPS[0]+2] = "X"
-                if not (self.measures.irSensor[center_id] > 1.2):#se nao tiver parede em frente nem a esquerda, a casa e adicionada as visitaveis
+                
+                if (not (self.measures.irSensor[center_id] > 1.2)) and self.coordinates[newGPS[1]][newGPS[0]+2] == " " :#se nao tiver parede em frente nem a esquerda, a casa e adicionada as visitaveis
                     self.visitableCoord = (newGPS[0]+2, newGPS[1]) 
                     self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
-
+                self.coordinates[newGPS[1]][newGPS[0]+2] = "X"
                 try:
                     self.walls.remove((newGPS[0]+1, newGPS[1]))
                     self.walls.remove((newGPS[0]+2, newGPS[1]))
@@ -319,14 +320,14 @@ class MyRob(CRobLinkAngs):
                 self.coordinates[newGPS[1]][newGPS[0]-1] = "|"
             else:
                 self.coordinates[newGPS[1]][newGPS[0]-1] = "X"
-                self.coordinates[newGPS[1]][newGPS[0]-2] = "X"
-                if not (self.measures.irSensor[center_id] > 1.2): #se nao tiver parede a frente nem a direita vai em frente
+                
+                if (not (self.measures.irSensor[center_id] > 1.2)) and self.coordinates[newGPS[1]][newGPS[0]-2] == " " : #se nao tiver parede a frente nem a direita vai em frente
                     self.visitableCoord = (newGPS[0]-2, newGPS[1])
                     self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
-                elif not (self.measures.irSensor[left_id] > 1.2): #se nao tiver parede a esquerda nem a direita, vai para a esquerda logo
+                elif (not (self.measures.irSensor[left_id] > 1.2)) and self.coordinates[newGPS[1]][newGPS[0]-2] == " " : #se nao tiver parede a esquerda nem a direita, vai para a esquerda logo
                     self.visitableCoord = (newGPS[0]-2, newGPS[1]) 
                     self.visitable.append(self.visitableCoord) #essa casa e acrescentada ao array de casas que podem ser visitadas
-
+                self.coordinates[newGPS[1]][newGPS[0]-2] = "X"
                 try:
                     self.walls.remove((newGPS[0]-1, newGPS[1]))
                     self.walls.remove((newGPS[0]-2, newGPS[1]))
@@ -375,7 +376,7 @@ class MyRob(CRobLinkAngs):
                     outfile.write(self.coordinates[i][j])
                     #print(self.coordinates[i][j])
                 outfile.write("\n")
-        print("\n".join(["".join([x for x in row])for row in self.coordinates]))
+        #print("\n".join(["".join([x for x in row])for row in self.coordinates]))
 
 
         #-------------------------------------ROTAÇÕES---------------------------------------------------------
@@ -451,41 +452,41 @@ class MyRob(CRobLinkAngs):
                     l = -0.15
                     r = -0.15
                     
-                    if (newGPS[0], newGPS[1]) not in self.visited: #se essa casa ainda nao tiver registada como visitada, e acrescentada as casas visitadas
-                        self.visited.append((newGPS[0], newGPS[1]))
+                    
                         
-                    self.verifySensorsXX()
+                    
+                    print(self.visitable)
 
-                    for item in self.visitable: #remove as casas visitaveis repetidas
-                        if item not in self.visitableNoRep and (item not in self.visited): 
-                            self.visitableNoRep.append(item) #e guarda neste array
+                    # for item in self.visitable: #remove as casas visitaveis repetidas
+                    #     if item not in self.visitableNoRep and (item not in self.visited): 
+                    #         self.visitableNoRep.append(item) #e guarda neste array
                     
                    # print("visitable: ", self.visitableNoRep)
                    # print("visited: ", self.visited)
 
                     #decide para onde vai conforme valores dos sensores
                     
-                    if ((self.measures.irSensor[center_id]< 1/0.72 and self.measures.compass <= 10 and self.measures.compass >= -10 and (newGPS[0]+2,newGPS[1]) not in self.visited )\
-                     or (self.measures.irSensor[center_id]< 1/0.72 and (self.measures.compass > 170 or self.measures.compass < -170) and (newGPS[0]-2,newGPS[1]) not in self.visited)) and self.andaComAstar == 0:   #Tem a possibilidade de ir em frente pois nao existe parede e não tem parede visitada
+                    if ((self.measures.irSensor[center_id]< 1/0.72 and self.measures.compass <= 10 and self.measures.compass >= -10 and self.coordinates[newGPS[1]][newGPS[0]+2] != "X")\
+                     or (self.measures.irSensor[center_id]< 1/0.72 and (self.measures.compass > 170 or self.measures.compass < -170) and self.coordinates[newGPS[1]][newGPS[0]-2] != "X")) and self.andaComAstar == 0:   #Tem a possibilidade de ir em frente pois nao existe parede e não tem parede visitada
                         self.driveMotors(0.15,0.15)
                         l = 0.15
                         r = 0.15
 
-                    elif((self.measures.irSensor[left_id]< 1/0.72 and self.measures.compass <= 10 and self.measures.compass >= -10 and (newGPS[0],newGPS[1]-2) not in self.visited)\
-                     or (self.measures.irSensor[left_id]< 1/0.72 and (self.measures.compass > 170 or self.measures.compass < -170) and (newGPS[0],newGPS[1]+2) not in self.visited)) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede e nao foi visitada
+                    elif((self.measures.irSensor[left_id]< 1/0.72 and self.measures.compass <= 10 and self.measures.compass >= -10 and self.coordinates[newGPS[1]-2][newGPS[0]] != "X")\
+                     or (self.measures.irSensor[left_id]< 1/0.72 and (self.measures.compass > 170 or self.measures.compass < -170) and self.coordinates[newGPS[1]+2][newGPS[0]] != "X")) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede e nao foi visitada
                         #self.driveMotors(-0.129, 0.129)
                         self.viraEsq = 1
                         deslocamentoX = math.floor(deslocamentoX)
                         self.updatePreviousMotors(0, 0)
 
-                    elif((self.measures.irSensor[right_id]< 1/0.72 and self.measures.compass <= 10 and self.measures.compass >= -10 and (newGPS[0],newGPS[1]+2) not in self.visited)\
-                     or (self.measures.irSensor[right_id]< 1/0.72 and (self.measures.compass > 170 or self.measures.compass < -170) and (newGPS[0],newGPS[1]-2) not in self.visited)) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a direita pois à direita nao tem parede e nao foi visitada
+                    elif((self.measures.irSensor[right_id]< 1/0.72 and self.measures.compass <= 10 and self.measures.compass >= -10 and self.coordinates[newGPS[1]+2][newGPS[0]] != "X")\
+                     or (self.measures.irSensor[right_id]< 1/0.72 and (self.measures.compass > 170 or self.measures.compass < -170) and self.coordinates[newGPS[1]-2][newGPS[0]] != "X")) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a direita pois à direita nao tem parede e nao foi visitada
                         #self.driveMotors(0.129, -0.129)
                         self.viraDir = 1
                         deslocamentoX = math.floor(deslocamentoX)
                         self.updatePreviousMotors(0, 0)
 
-                    elif ((self.measures.irSensor[right_id]>= 1/0.72 and self.measures.irSensor[center_id]>= 1/0.72 and self.measures.irSensor[left_id]>= 1/0.72)) and self.andaComAstar == 0:   #Está num beco, tem de inverter
+                    elif (self.measures.irSensor[right_id]>= 1/0.72 and self.measures.irSensor[center_id]>= 1/0.72 and self.measures.irSensor[left_id]>= 1/0.72) and self.andaComAstar == 0:   #Está num beco, tem de inverter
                         #self.driveMotors(0.129, -0.129)
                         self.reverte = 1
                         deslocamentoX = math.floor(deslocamentoX)
@@ -494,30 +495,30 @@ class MyRob(CRobLinkAngs):
                     else:   #As posições à volta dele já estão todas visitadas
 
                         if self.andaComAstar == 0:#se ainda nao estiver a andar com o A*, ainda nao precisa de executar o codigo deste if
-
+                            print("anda com A*")
                             a = pf.AStar()
                             self.origin = (newGPS[0], newGPS[1])
                             
-                            for destiny in self.visitableNoRep:
+                            for destiny in self.visitable:
                                 x1 = destiny[0]
                                 y1 = destiny[1]
                                 x2 = newGPS[0]
                                 y2 = newGPS[1]
                                 if (x1 == x2 and y1 == y2): #se destino igual ao inicio, já foi visitad, logo nao vale a pena ir!
-                                    self.visitableNoRep.remove((x1, y1))
+                                    self.visitable.remove((x1, y1))
                                 else:
                                     dist = sqrt( (x2 - x1)**2 + (y2 - y1)**2 )
                                     if dist < self.min:
                                         self.min = dist
                                         self.destinoCurto = ((x1, y1))
-     
+                            #print("origem: " + str(self.origin) + " destino: " + str(self.destinoCurto))
                             a.init_grid(56, 27, self.walls, self.origin, self.destinoCurto)
                             self.smallestPath = a.solve()
                             self.min = 1234
 
                             for vis in range(len(self.smallestPath)): #para cada casa no smallestPath
-                                if self.smallestPath[vis] in self.visitableNoRep: #se existir no array de visitaveis
-                                    self.visitableNoRep.remove(self.smallestPath[vis]) #e retirado porque ja vai ser visitada
+                                if self.smallestPath[vis] in self.visitable: #se existir no array de visitaveis
+                                    self.visitable.remove(self.smallestPath[vis]) #e retirado porque ja vai ser visitada
 
                             self.andaComAstar = 1
                             self.smallestPath.pop(0) #retira o ponto de partida
@@ -541,14 +542,12 @@ class MyRob(CRobLinkAngs):
                                     self.updateSmallestPath()
 
                                 elif (joystick == (0,2)):
-                                    print("vira esquerda E vai em frente")
                                     self.viraEsq = 1
                                     deslocamentoX = math.floor(deslocamentoX)
                                     self.updatePreviousMotors(0, 0)
                                     self.updateSmallestPath()
 
                                 elif (joystick == (0,-2)):
-                                    print("vira direita E vai em frente")
                                     self.viraDir = 1
                                     deslocamentoX = math.floor(deslocamentoX)
                                     self.updatePreviousMotors(0, 0)
@@ -557,34 +556,32 @@ class MyRob(CRobLinkAngs):
                             else: #se esta virado para a esquerda
 
                                 if(joystick == (2,0) ):
-                                    print("vai em frente")
                                     self.driveMotors(0.15,0.15)
                                     l = 0.15
                                     r = 0.15
                                     self.updateSmallestPath()
 
                                 elif(joystick == (-2,0)):
-                                    print("Reverte E vai em frente")
                                     self.reverte = 1
                                     deslocamentoX = math.floor(deslocamentoX)
                                     self.updatePreviousMotors(0, 0)
                                     self.updateSmallestPath()
 
                                 elif (joystick == (0,2)):
-                                    print("vira esquerda se virado para a direita E vai em frente")
                                     self.viraDir = 1
                                     deslocamentoX = math.floor(deslocamentoX)
                                     self.updatePreviousMotors(0, 0)
                                     self.updateSmallestPath()
 
                                 elif (joystick == (0,-2)):
-                                    print("vira direita se virado para a direita E vai em frente")
                                     self.viraEsq = 1
                                     deslocamentoX = math.floor(deslocamentoX)
                                     self.updatePreviousMotors(0, 0)
                                     self.updateSmallestPath()
 
-
+                    self.verifySensorsXX()
+                    if (newGPS[0], newGPS[1]) in self.visitable: #se a casa atual estiver nos visitaveis remove
+                        self.visitable.remove((newGPS[0], newGPS[1]))
                     # para acertar posição do robot 
                     if self.measures.irSensor[center_id]> 1/0.35: 
                         
@@ -601,7 +598,7 @@ class MyRob(CRobLinkAngs):
                     deslocamentoX += self.mediaCoordenadas  #determinação do deslocamento horizontal(incrementa sempre)
                     self.updatePreviousMotors(l, r) #atualiza as potencias dos motores da itereção anterior (para se usar na prox iteração e fzr a média)
 
-                         
+                        
                         
                             
 
@@ -652,31 +649,28 @@ class MyRob(CRobLinkAngs):
                     l = -0.15
                     r = -0.15
                     
-                    if (newGPS[0], newGPS[1]) not in self.visited: #se essa casa ainda nao tiver registada como visitada, e acrescentada as casas visitadas
-                        self.visited.append((newGPS[0], newGPS[1]))
                     
-                    self.verifySensorsYY()
-                    
-                    for item in self.visitable:
-                        if item not in self.visitableNoRep and (item not in self.visited):
-                            self.visitableNoRep.append(item)
+                    print(self.visitable)
+                    # for item in self.visitable:
+                    #     if item not in self.visitableNoRep and (item not in self.visited):
+                    #         self.visitableNoRep.append(item)
 
                     #decide para onde vai conforme valores dos sensores
                     
-                    if ((self.measures.irSensor[center_id]< 1/0.72 and self.measures.compass <= 100 and self.measures.compass >= 80 and (newGPS[0],newGPS[1]-2) not in self.visited)\
-                     or (self.measures.irSensor[center_id]< 1/0.72 and (self.measures.compass > -100 and self.measures.compass < -80) and (newGPS[0],newGPS[1]+2) not in self.visited)) and self.andaComAstar == 0:   #Tem a possibilidade de ir em frente pois nao existe parede e não foi visitada
+                    if ((self.measures.irSensor[center_id]< 1/0.72 and self.measures.compass <= 100 and self.measures.compass >= 80 and self.coordinates[newGPS[1]-2][newGPS[0]] != "X")\
+                     or (self.measures.irSensor[center_id]< 1/0.72 and (self.measures.compass > -100 and self.measures.compass < -80) and self.coordinates[newGPS[1]+2][newGPS[0]] != "X")) and self.andaComAstar == 0:   #Tem a possibilidade de ir em frente pois nao existe parede e não foi visitada
                         self.driveMotors(0.15,0.15)
                         l = 0.15
                         r = 0.15
 
-                    elif((self.measures.irSensor[left_id]< 1/0.72 and self.measures.compass <= 100 and self.measures.compass >= 80 and (newGPS[0]-2,newGPS[1]) not in self.visited)\
-                     or (self.measures.irSensor[left_id]< 1/0.72 and (self.measures.compass > -100 and self.measures.compass < -80) and (newGPS[0]+2,newGPS[1]) not in self.visited)) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede e nao foi visitada                       
+                    elif((self.measures.irSensor[left_id]< 1/0.72 and self.measures.compass <= 100 and self.measures.compass >= 80 and self.coordinates[newGPS[1]][newGPS[0]-2] != "X")\
+                     or (self.measures.irSensor[left_id]< 1/0.72 and (self.measures.compass > -100 and self.measures.compass < -80) and self.coordinates[newGPS[1]][newGPS[0]+2] != "X")) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede e nao foi visitada                       
                         self.viraEsq = 1
                         deslocamentoY = math.floor(deslocamentoY)
                         self.updatePreviousMotors(0, 0)
 
-                    elif((self.measures.irSensor[right_id]< 1/0.72 and self.measures.compass <= 100 and self.measures.compass >= 80 and (newGPS[0]+2,newGPS[1]) not in self.visited)\
-                     or (self.measures.irSensor[right_id]< 1/0.72 and (self.measures.compass > -100 and self.measures.compass < -80) and (newGPS[0]-2,newGPS[1]) not in self.visited)) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a direita pois à direita nao tem parede e nao foi visitada                        
+                    elif((self.measures.irSensor[right_id]< 1/0.72 and self.measures.compass <= 100 and self.measures.compass >= 80 and self.coordinates[newGPS[1]][newGPS[0]+2] != "X")\
+                     or (self.measures.irSensor[right_id]< 1/0.72 and (self.measures.compass > -100 and self.measures.compass < -80) and self.coordinates[newGPS[1]][newGPS[0]-2] != "X")) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a direita pois à direita nao tem parede e nao foi visitada                        
                         self.viraDir = 1
                         deslocamentoY = math.floor(deslocamentoY)
                         self.updatePreviousMotors(0, 0)
@@ -691,14 +685,14 @@ class MyRob(CRobLinkAngs):
                             a = pf.AStar()
                             self.origin = (newGPS[0], newGPS[1])
                             
-                            for destiny in self.visitableNoRep: #para ver qual a visitavel mais perto
+                            for destiny in self.visitable: #para ver qual a visitavel mais perto
                                 x1 = destiny[0]
                                 y1 = destiny[1]
                                 x2 = newGPS[0]
                                 y2 = newGPS[1]
 
                                 if (x1 == x2 and y1 == y2):
-                                    self.visitableNoRep.remove((x1, y1))
+                                    self.visitable.remove((x1, y1))
                                 else:
                                     dist = sqrt( (x2 - x1)**2 + (y2 - y1)**2 )
                                     if dist < self.min:
@@ -709,8 +703,8 @@ class MyRob(CRobLinkAngs):
                             self.min = 1234 #volta a por um minimo muito grande para na proxima iteração achar novo minimo
 
                             for vis in range(len(self.smallestPath)): #para cada casa no smallestPath
-                                if self.smallestPath[vis] in self.visitableNoRep: #se existir no array de visitaveis
-                                    self.visitableNoRep.remove(self.smallestPath[vis]) #e retirado porque ja vai ser visitada
+                                if self.smallestPath[vis] in self.visitable: #se existir no array de visitaveis
+                                    self.visitable.remove(self.smallestPath[vis]) #e retirado porque ja vai ser visitada
 
                             self.andaComAstar = 1
                             self.smallestPath.pop(0) #retira o ponto de partida
@@ -770,7 +764,9 @@ class MyRob(CRobLinkAngs):
                                     deslocamentoY = math.floor(deslocamentoY)
                                     self.updatePreviousMotors(0, 0)
                                     self.updateSmallestPath()
-
+                    self.verifySensorsYY()
+                    if (newGPS[0], newGPS[1]) in self.visitable: #se a casa atual estiver nos visitaveis remove
+                        self.visitable.remove((newGPS[0], newGPS[1]))
                     # para acertar posição do robot 
                     if self.measures.irSensor[center_id]> 1/0.35: #se estiver muito perto de uma parede corrige pos
                         if self.measures.compass >=60 and self.measures.compass <=120:    #se estiver virado para cima
@@ -784,7 +780,10 @@ class MyRob(CRobLinkAngs):
                     self.mediaCoordenadas = (((previousPowerR + previousPowerL)/2) + ((l+r)/2)) /2  #obtenção de coordenadas mais especificas
                     deslocamentoY += self.mediaCoordenadas  #determinação do deslocamento horizontal(incrementa sempre)
                     self.updatePreviousMotors(l, r) #atualiza as potencias dos motores da itereção anterior (para se usar na prox iteração e fzr a média)
-
+        
+        # if self.contadorCiclos>10 and len(self.visitable) == 0:#chamar o finish
+        #     print("chamar o finish")
+        #     # self.finish(self)
        
 class Map():
     def __init__(self, filename):
