@@ -55,7 +55,7 @@ class MyRob(CRobLinkAngs):
 
         self.foo = " " #inicializa todos os espaços com " "
         self.coordinates = [[self.foo for x in range(55)] for y in range(27)] #cria um array bidimensional [56][27]
-        self.coordinates[13][27] = "I" #posicao inicial
+        self.coordinates[13][27] = "0" #posicao inicial
         self.walls = []
         for x in range(57):
             for y in range(28):
@@ -71,6 +71,8 @@ class MyRob(CRobLinkAngs):
         self.orientacaoX = 0
         self.orientacaoY = 0
         
+        self.beaconsFound = [] #array para guardar os beacons encontrados
+        self.countPos = 0 #num de pos no array de beacons
 
     # In this map the center of cell (i,j), (i in 0..6, j in 0..13) is mapped to labMap[i*2][j*2].
     # to know if there is a wall on top of cell(i,j) (i in 0..5), check if the value of labMap[i*2+1][j*2] is space or not
@@ -137,7 +139,7 @@ class MyRob(CRobLinkAngs):
         right_id = 2
 
         if newGPS[0]== 27 and newGPS[1] == 13:
-            self.coordinates[newGPS[1]][newGPS[0]] = "I"  #a posicao onde se encontra é o inicio (I)
+            self.coordinates[newGPS[1]][newGPS[0]] = "0"  #a posicao onde se encontra é o inicio (I)
         else:
             self.coordinates[newGPS[1]][newGPS[0]] = "X" #a posicao onde se encontra esta vazia (x)
         try:
@@ -241,7 +243,7 @@ class MyRob(CRobLinkAngs):
         right_id = 2
 
         if newGPS[0]== 27 and newGPS[1] == 13:
-            self.coordinates[newGPS[1]][newGPS[0]] = "I"  #a posicao onde se encontra é o inicio (I)
+            self.coordinates[newGPS[1]][newGPS[0]] = "0"  #a posicao onde se encontra é o inicio (I)
         else:
             self.coordinates[newGPS[1]][newGPS[0]] = "X" #a posicao onde se encontra esta vazia (x)
         try:
@@ -370,7 +372,7 @@ class MyRob(CRobLinkAngs):
             self.verifySensorsXX()  #só chamamos esta função, pois ele começa sempre na horizontal
             self.contadorCiclos+=1
             self.previousGps = [27, 13]
-
+            self.beaconsFound.append((27,13)) #a primeira posicao e sempre um beacon
 
         #---------------------------ESCREVER NO FICHEIRO-----------------------------------------------
         with open('map.out', 'w') as outfile: 
@@ -379,7 +381,7 @@ class MyRob(CRobLinkAngs):
                     outfile.write(self.coordinates[i][j])
                     #print(self.coordinates[i][j])
                 outfile.write("\n")
-        print("\n".join(["".join([x for x in row])for row in self.coordinates]))
+        #print("\n".join(["".join([x for x in row])for row in self.coordinates]))
 
 
         #-------------------------------------ROTAÇÕES---------------------------------------------------------
@@ -455,8 +457,12 @@ class MyRob(CRobLinkAngs):
                     l = -0.15
                     r = -0.15
                     
-                    
-                        
+                    #verifica se a posicao onde se encontra e um beacon
+                    if self.measures.ground > 0:
+                        if ((newGPS[0], newGPS[1])) not in self.beaconsFound: #evita repetidos
+                            self.beaconsFound.append((newGPS[0], newGPS[1])) 
+
+                    print("beacons array: ", self.beaconsFound) 
                     
                     #print(self.visitable)
 
@@ -519,9 +525,10 @@ class MyRob(CRobLinkAngs):
                             self.smallestPath = a.solve()
                             self.min = 1234
 
-                            for vis in range(len(self.smallestPath)): #para cada casa no smallestPath
-                                if self.smallestPath[vis] in self.visitable: #se existir no array de visitaveis
-                                    self.visitable.remove(self.smallestPath[vis]) #e retirado porque ja vai ser visitada
+                            if(len(self.smallestPath) != 0):
+                                for vis in range(len(self.smallestPath)): #para cada casa no smallestPath
+                                    if self.smallestPath[vis] in self.visitable: #se existir no array de visitaveis
+                                        self.visitable.remove(self.smallestPath[vis]) #e retirado porque ja vai ser visitada
 
                             self.andaComAstar = 1
                             self.smallestPath.pop(0) #retira o ponto de partida
@@ -583,6 +590,13 @@ class MyRob(CRobLinkAngs):
                                     self.updateSmallestPath()
 
                     self.verifySensorsXX()
+
+                    for i in self.beaconsFound: #coloca os beacons com valores no map.out
+                        self.coordinates[i[1]][i[0]] = str(self.countPos)
+                        self.countPos+=1
+                    
+                    self.countPos = 0
+
                     if (newGPS[0], newGPS[1]) in self.visitable: #se a casa atual estiver nos visitaveis remove
                         self.visitable.remove((newGPS[0], newGPS[1]))
                     # para acertar posição do robot 
@@ -653,8 +667,15 @@ class MyRob(CRobLinkAngs):
                     l = -0.15
                     r = -0.15
                     
+                    #verifica se a posicao onde se encontra e um beacon
+                    if self.measures.ground > 0:
+                        if ((newGPS[0], newGPS[1])) not in self.beaconsFound: #evita repetidos
+                            self.beaconsFound.append((newGPS[0], newGPS[1])) 
+
+                    print("beacons array: ", self.beaconsFound)
                     
                     #print(self.visitable)
+
                     # for item in self.visitable:
                     #     if item not in self.visitableNoRep and (item not in self.visited):
                     #         self.visitableNoRep.append(item)
@@ -706,9 +727,10 @@ class MyRob(CRobLinkAngs):
                             self.smallestPath = a.solve()
                             self.min = 1234 #volta a por um minimo muito grande para na proxima iteração achar novo minimo
 
-                            for vis in range(len(self.smallestPath)): #para cada casa no smallestPath
-                                if self.smallestPath[vis] in self.visitable: #se existir no array de visitaveis
-                                    self.visitable.remove(self.smallestPath[vis]) #e retirado porque ja vai ser visitada
+                            if(len(self.smallestPath) != 0): #tava a dar um erro de nao encontrar smallPath
+                                for vis in range(len(self.smallestPath)): #para cada casa no smallestPath
+                                    if self.smallestPath[vis] in self.visitable: #se existir no array de visitaveis
+                                        self.visitable.remove(self.smallestPath[vis]) #e retirado porque ja vai ser visitada
 
                             self.andaComAstar = 1
                             self.smallestPath.pop(0) #retira o ponto de partida
@@ -768,11 +790,20 @@ class MyRob(CRobLinkAngs):
                                     deslocamentoY = math.floor(deslocamentoY)
                                     self.updatePreviousMotors(0, 0)
                                     self.updateSmallestPath()
+
                     self.verifySensorsYY()
+
+                    for i in self.beaconsFound: #coloca os beacons com valores no map.out
+                        self.coordinates[i[1]][i[0]] = str(self.countPos)
+                        self.countPos+=1
+                    
+                    self.countPos = 0
+
                     if (newGPS[0], newGPS[1]) in self.visitable: #se a casa atual estiver nos visitaveis remove
                         self.visitable.remove((newGPS[0], newGPS[1]))
                     # para acertar posição do robot 
                     if self.measures.irSensor[center_id]> 1/0.35: #se estiver muito perto de uma parede corrige pos
+                        
                         valorCorrigir = 0.55 -(1/self.measures.irSensor[center_id])
                         if self.measures.compass >=60 and self.measures.compass <=120:    #se estiver virado para cima
                             self.orientacaoY = 1
@@ -785,10 +816,52 @@ class MyRob(CRobLinkAngs):
                     self.mediaCoordenadas = (((previousPowerR + previousPowerL)/2) + ((l+r)/2)) /2  #obtenção de coordenadas mais especificas
                     deslocamentoY += self.mediaCoordenadas  #determinação do deslocamento horizontal(incrementa sempre)
                     self.updatePreviousMotors(l, r) #atualiza as potencias dos motores da itereção anterior (para se usar na prox iteração e fzr a média)
-        
+
+        if self.contadorCiclos % 10 == 0: #pra imprimir o caminho ate ao beacon
+            self.contadorCiclos+=1
+            if len(self.beaconsFound) > 1:
+                cnt = 0
+                solucao = []
+                for b in range(len(self.beaconsFound)-1):
+                    a = pf.AStar()
+                    a.init_grid(56, 27, self.walls, self.beaconsFound[b], self.beaconsFound[b+1])
+                    path = a.solve()
+                    if b > 0:
+                        path.pop(0) #remove o primeiro e segundo elementos
+                        path.pop(0) #para evitar repeticao (por causa do #)
+                    solucao.append(path) #so com este for ja se atrapalha
+                    cnt+=1 #para cada beacon
+
+                #faz isto para calcular o caminho do ultimo ate ao inicio 
+                a2 = pf.AStar()   
+                a2.init_grid(56, 27, self.walls, self.beaconsFound[cnt], self.beaconsFound[0])
+                path = a2.solve()
+                path.pop(0)
+                path.pop(0)
+                solucao.append(path)
+                
+                print("sol: ", solucao)
+                
+                with open('path.out', 'w') as outfile: 
+                    cnt3=0
+                    for i in solucao:
+                        cnt2 = 0
+                        cnt3+=1
+                        for j in i:
+                            cnt2+=1
+                            if(cnt2%2!=0):
+                                j1 = ((j[0]-27), (j[1]-13))
+                                outfile.write(str(j1).replace(",", "").replace("(", "").replace(")", "")) 
+                                if j in self.beaconsFound[1:]: #nao compara com o 27,13    
+                                    print("found")
+                                    outfile.write("#"+str(cnt3))
+                                outfile.write("\n")
+
+
         if self.contadorCiclos>10 and len(self.visitable) == 0:#chamar o finish
             print("chamar o finish")
         #     # self.finish(self)
+
        
 class Map():
     def __init__(self, filename):
