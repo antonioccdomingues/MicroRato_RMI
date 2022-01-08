@@ -348,8 +348,16 @@ class MyRob(CRobLinkAngs):
 
         if len(self.smallestPath) == 0:#se já executou todos os steps, termina de andar com o A*
             self.andaComAstar = 0   #Para de andar com o A*
+
     def writeBeaconsFile(self):
         if len(self.beaconsFound) > 1:
+            
+                for i in self.beaconsFound: #coloca os beacons com valores no map.out
+                    self.coordinates[i[1]][i[0]] = str(self.countPos)
+                    self.countPos+=1
+
+                self.countPos = 0
+
                 cnt = 0
                 solucao = []
                 for b in range(len(self.beaconsFound)-1):
@@ -625,7 +633,7 @@ class MyRob(CRobLinkAngs):
                     # para acertar posição do robot 
                     if self.measures.irSensor[center_id]> 1/0.35: 
 
-                        valorCorrigir = 0.56 -(1/self.measures.irSensor[center_id])
+                        valorCorrigir = 0.55 -(1/self.measures.irSensor[center_id])
                         if self.measures.compass <= 10 and self.measures.compass >= -10:    #se estiver virado para norte
                             self.orientacaoX = 1
                         elif (self.measures.compass <=-170 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=170):   #se estiver virado para sul
@@ -814,7 +822,7 @@ class MyRob(CRobLinkAngs):
                     # para acertar posição do robot 
                     if self.measures.irSensor[center_id]> 1/0.35: #se estiver muito perto de uma parede corrige pos
                         
-                        valorCorrigir = 0.56 -(1/self.measures.irSensor[center_id])
+                        valorCorrigir = 0.55 -(1/self.measures.irSensor[center_id])
                         if self.measures.compass >=60 and self.measures.compass <=120:    #se estiver virado para cima
                             self.orientacaoY = 1
                         elif self.measures.compass >=-120 and self.measures.compass <=-60:   #se estiver virado para baixo
