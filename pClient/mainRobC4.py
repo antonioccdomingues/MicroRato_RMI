@@ -59,7 +59,7 @@ class MyRob(CRobLinkAngs):
         self.visitableCoord = (0,0) #coordenadas que vao ser guardadas no array visitable
         self.visitable = [] #array onde ficam guardadas as posicoes que foram marcadas como visitaveis, mas nao chegaram a ser visitadas
         self.visitableNoRep = [] ##array de visitaveis nde nao ha posicoes repetidades
-        self.visited = [] #array com as posicoes ja visitadas
+        #self.visited = [] #array com as posicoes ja visitadas
 
         self.previousGps = [0,0]
         self.contadorCiclos = 0
@@ -67,6 +67,7 @@ class MyRob(CRobLinkAngs):
         self.foo = " " #inicializa todos os espaços com " "
         self.coordinates = [[self.foo for x in range(55)] for y in range(27)] #cria um array bidimensional [56][27]
         self.coordinates[13][27] = "0" #posicao inicial
+        self.visited = [[self.foo for x in range(55)] for y in range(27)] #cria um array bidimensional [56][27]
         self.walls = []
         for x in range(57):
             for y in range(28):
@@ -151,8 +152,10 @@ class MyRob(CRobLinkAngs):
 
         if newGPS[0]== 27 and newGPS[1] == 13:
             self.coordinates[newGPS[1]][newGPS[0]] = "0"  #a posicao onde se encontra é o inicio (I)
+            self.visited[newGPS[1]][newGPS[0]] = "X"
         else:
             self.coordinates[newGPS[1]][newGPS[0]] = "X" #a posicao onde se encontra esta vazia (x)
+            self.visited[newGPS[1]][newGPS[0]] = "X"
         try:
             self.walls.remove((newGPS[0], newGPS[1]))
         except:
@@ -264,8 +267,10 @@ class MyRob(CRobLinkAngs):
 
         if newGPS[0]== 27 and newGPS[1] == 13:
             self.coordinates[newGPS[1]][newGPS[0]] = "0"  #a posicao onde se encontra é o inicio (I)
+            self.visited[newGPS[1]][newGPS[0]] = "X"
         else:
             self.coordinates[newGPS[1]][newGPS[0]] = "X" #a posicao onde se encontra esta vazia (x)
+            self.visited[newGPS[1]][newGPS[0]] = "X"
         try:
             self.walls.remove((newGPS[0], newGPS[1]))
         except:
@@ -565,6 +570,8 @@ class MyRob(CRobLinkAngs):
                         self.visitable.remove((newGPS[0], newGPS[1]))
                         
                     if self.ACABAR == 1 and newGPS[0] == 27 and newGPS[1] == 13:
+                        self.driveMotors(-0.15, -0.15)
+                        self.coordinates[13][27] = "0"
                         self.writeMap()
                         self.writeBeaconsFile()
                         self.finish()
@@ -586,25 +593,25 @@ class MyRob(CRobLinkAngs):
 
                     #print("beacons array: ", self.beaconsFound) 
                     
-                    print(self.visitable)
+                    #print(self.visitable)
 
                     #decide para onde vai conforme valores dos sensores
                     
-                    if ((self.measures.irSensor[center_id]< 1/0.72 and self.measures.compass <= 10 and self.measures.compass >= -10 and self.coordinates[newGPS[1]][newGPS[0]+2] not in self.javisitou)\
-                     or (self.measures.irSensor[center_id]< 1/0.72 and (self.measures.compass > 170 or self.measures.compass < -170) and self.coordinates[newGPS[1]][newGPS[0]-2] not in self.javisitou)) and self.andaComAstar == 0:   #Tem a possibilidade de ir em frente pois nao existe parede e não tem parede visitada
+                    if ((self.measures.irSensor[center_id]< 1/0.72 and self.measures.compass <= 10 and self.measures.compass >= -10 and self.visited[newGPS[1]][newGPS[0]+2] != "X")\
+                     or (self.measures.irSensor[center_id]< 1/0.72 and (self.measures.compass > 170 or self.measures.compass < -170) and self.visited[newGPS[1]][newGPS[0]-2] != "X")) and self.andaComAstar == 0:   #Tem a possibilidade de ir em frente pois nao existe parede e não tem parede visitada
                         self.driveMotors(0.15,0.15)
                         l = 0.15
                         r = 0.15
 
-                    elif((self.measures.irSensor[left_id] <= 1.176470588  and self.measures.compass <= 10 and self.measures.compass >= -10 and self.coordinates[newGPS[1]-2][newGPS[0]] not in self.javisitou)\
-                     or (self.measures.irSensor[left_id]<= 1.176470588 and (self.measures.compass > 170 or self.measures.compass < -170) and self.coordinates[newGPS[1]+2][newGPS[0]] not in self.javisitou)) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede e nao foi visitada
+                    elif((self.measures.irSensor[left_id] <= 1.176470588  and self.measures.compass <= 10 and self.measures.compass >= -10 and self.visited[newGPS[1]-2][newGPS[0]] != "X")\
+                     or (self.measures.irSensor[left_id]<= 1.176470588 and (self.measures.compass > 170 or self.measures.compass < -170) and self.visited[newGPS[1]+2][newGPS[0]] != "X")) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede e nao foi visitada
                         #self.driveMotors(-0.129, 0.129)
                         self.viraEsq = 1
                         deslocamentoX = math.floor(deslocamentoX)
                         self.updatePreviousMotors(0, 0)
 
-                    elif((self.measures.irSensor[right_id]<= 1.176470588 and self.measures.compass <= 10 and self.measures.compass >= -10 and self.coordinates[newGPS[1]+2][newGPS[0]] not in self.javisitou)\
-                     or (self.measures.irSensor[right_id]<= 1.176470588 and (self.measures.compass > 170 or self.measures.compass < -170) and self.coordinates[newGPS[1]-2][newGPS[0]] not in self.javisitou)) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a direita pois à direita nao tem parede e nao foi visitada
+                    elif((self.measures.irSensor[right_id]<= 1.176470588 and self.measures.compass <= 10 and self.measures.compass >= -10 and self.visited[newGPS[1]+2][newGPS[0]] != "X")\
+                     or (self.measures.irSensor[right_id]<= 1.176470588 and (self.measures.compass > 170 or self.measures.compass < -170) and self.visited[newGPS[1]-2][newGPS[0]] != "X")) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a direita pois à direita nao tem parede e nao foi visitada
                         #self.driveMotors(0.129, -0.129)
                         self.viraDir = 1
                         deslocamentoX = math.floor(deslocamentoX)
@@ -725,26 +732,19 @@ class MyRob(CRobLinkAngs):
                         self.beco = 1    
                     elif self.measures.irSensor[right_id]>= 1/0.45: 
                         #print(1/self.measures.irSensor[center_id])
-                        valorCorrigir = 0.44 -(1/self.measures.irSensor[right_id])
+                        valorCorrigir = 0.435 -(1/self.measures.irSensor[right_id])
                         if self.measures.compass <= 30 and self.measures.compass >= -30:    #se estiver virado para direita
                             self.direitaXX = 1
                         elif (self.measures.compass <=-160 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=160):   #se estiver virado para esquerda
                             self.direitaXX = -1
                     elif self.measures.irSensor[left_id]>= 1/0.45: 
                         #print(1/self.measures.irSensor[center_id])
-                        valorCorrigir = 0.44 -(1/self.measures.irSensor[left_id])
+                        valorCorrigir = 0.435 -(1/self.measures.irSensor[left_id])
                         if self.measures.compass <= 30 and self.measures.compass >= -30:    #se estiver virado para direita
                             self.esquerdaXX = 1
                         elif (self.measures.compass <=-160 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=160):   #se estiver virado para esquerda
                             self.esquerdaXX = -1
                         
-                    # if self.contadorCiclos>10 and len(self.visitable) == 0:#chamar o finish
-                    #     print("chamar o finish")
-                    #     self.writeMap()
-                    #     self.writeBeaconsFile()
-                    #     self.finish()
-                    #     sys.exit()
-                # cáluco do deslocamento de cada iteração
                 if(self.viraDir ==0 and self.viraEsq == 0 and self.reverte == 0):
                     
                     self.mediaCoordenadas = (((previousPowerR + previousPowerL)/2) + ((l+r)/2)) /2  #obtenção de coordenadas mais especificas
@@ -838,6 +838,8 @@ class MyRob(CRobLinkAngs):
                         self.visitable.remove((newGPS[0], newGPS[1]))
 
                     if self.ACABAR == 1 and newGPS[0] == 27 and newGPS[1] == 13:
+                        self.driveMotors(-0.15, -0.15)
+                        self.coordinates[13][27] = "0"
                         self.writeMap()
                         self.writeBeaconsFile()
                         self.finish()
@@ -857,24 +859,24 @@ class MyRob(CRobLinkAngs):
                             self.countPos += 1
 
                     #print("beacons array: ", self.beaconsFound)
-                    print(self.visitable)
+                    #print(self.visitable)
 
                     #decide para onde vai conforme valores dos sensores
                     
-                    if ((self.measures.irSensor[center_id]< 1/0.72 and self.measures.compass <= 100 and self.measures.compass >= 80 and self.coordinates[newGPS[1]-2][newGPS[0]] not in self.javisitou)\
-                     or (self.measures.irSensor[center_id]< 1/0.72 and (self.measures.compass > -100 and self.measures.compass < -80) and self.coordinates[newGPS[1]+2][newGPS[0]] not in self.javisitou)) and self.andaComAstar == 0:   #Tem a possibilidade de ir em frente pois nao existe parede e não foi visitada
+                    if ((self.measures.irSensor[center_id]< 1/0.72 and self.measures.compass <= 100 and self.measures.compass >= 80 and self.visited[newGPS[1]-2][newGPS[0]] != "X")\
+                     or (self.measures.irSensor[center_id]< 1/0.72 and (self.measures.compass > -100 and self.measures.compass < -80) and self.visited[newGPS[1]+2][newGPS[0]] != "X")) and self.andaComAstar == 0:   #Tem a possibilidade de ir em frente pois nao existe parede e não foi visitada
                         self.driveMotors(0.15,0.15)
                         l = 0.15
                         r = 0.15
 
-                    elif((self.measures.irSensor[left_id]<= 1.176470588 and self.measures.compass <= 100 and self.measures.compass >= 80 and self.coordinates[newGPS[1]][newGPS[0]-2] not in self.javisitou)\
-                     or (self.measures.irSensor[left_id]<= 1.176470588 and (self.measures.compass > -100 and self.measures.compass < -80) and self.coordinates[newGPS[1]][newGPS[0]+2] not in self.javisitou)) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede e nao foi visitada                       
+                    elif((self.measures.irSensor[left_id]<= 1.176470588 and self.measures.compass <= 100 and self.measures.compass >= 80 and self.visited[newGPS[1]][newGPS[0]-2] != "X")\
+                     or (self.measures.irSensor[left_id]<= 1.176470588 and (self.measures.compass > -100 and self.measures.compass < -80) and self.visited[newGPS[1]][newGPS[0]+2] != "X")) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede e nao foi visitada                       
                         self.viraEsq = 1
                         deslocamentoY = math.floor(deslocamentoY)
                         self.updatePreviousMotors(0, 0)
 
-                    elif((self.measures.irSensor[right_id]<= 1.176470588 and self.measures.compass <= 100 and self.measures.compass >= 80 and self.coordinates[newGPS[1]][newGPS[0]+2] not in self.javisitou)\
-                     or (self.measures.irSensor[right_id]<= 1.176470588 and (self.measures.compass > -100 and self.measures.compass < -80) and self.coordinates[newGPS[1]][newGPS[0]-2] not in self.javisitou)) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a direita pois à direita nao tem parede e nao foi visitada                        
+                    elif((self.measures.irSensor[right_id]<= 1.176470588 and self.measures.compass <= 100 and self.measures.compass >= 80 and self.visited[newGPS[1]][newGPS[0]+2] != "X")\
+                     or (self.measures.irSensor[right_id]<= 1.176470588 and (self.measures.compass > -100 and self.measures.compass < -80) and self.visited[newGPS[1]][newGPS[0]-2] != "X")) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a direita pois à direita nao tem parede e nao foi visitada                        
                         self.viraDir = 1
                         deslocamentoY = math.floor(deslocamentoY)
                         self.updatePreviousMotors(0, 0)
@@ -991,28 +993,19 @@ class MyRob(CRobLinkAngs):
                         self.beco = 1 
                     elif self.measures.irSensor[right_id]>= 1/0.45: 
                         #print(1/self.measures.irSensor[center_id])
-                        valorCorrigir = 0.44 -(1/self.measures.irSensor[right_id])
+                        valorCorrigir = 0.435 -(1/self.measures.irSensor[right_id])
                         if self.measures.compass >=60 and self.measures.compass <=120:    #se estiver virado para cima
                             self.direitaYY = 1
                         elif self.measures.compass >=-120 and self.measures.compass <=-60:   #se estiver virado para baixo
                             self.direitaYY = -1
                     elif self.measures.irSensor[left_id]>= 1/0.45: 
                         #print(1/self.measures.irSensor[center_id])
-                        valorCorrigir = 0.44 -(1/self.measures.irSensor[left_id])
+                        valorCorrigir = 0.435 -(1/self.measures.irSensor[left_id])
                         if self.measures.compass >=60 and self.measures.compass <=120:    #se estiver virado para cima
                             self.esquerdaYY = 1
                         elif self.measures.compass >=-120 and self.measures.compass <=-60:   #se estiver virado para baixo
                             self.esquerdaYY = -1
 
-
-
-                    # if self.contadorCiclos>10 and len(self.visitable) == 0:#chamar o finish
-                    #     print("chamar o finish")
-                    #     self.writeMap()
-                    #     self.writeBeaconsFile()
-                    #     self.finish()
-                    #     sys.exit()
-                # cáluco do deslocamento de cada iteração
                 if(self.viraDir ==0 and self.viraEsq == 0 and self.reverte == 0):
                     
                     self.mediaCoordenadas = (((previousPowerR + previousPowerL)/2) + ((l+r)/2)) /2  #obtenção de coordenadas mais especificas
