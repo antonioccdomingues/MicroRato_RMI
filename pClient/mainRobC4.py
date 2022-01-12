@@ -46,6 +46,14 @@ class MyRob(CRobLinkAngs):
         self.rob_name = ""
         self.ACABAR = 0
         self.javisitou = ["X", "0", "1", "2", "3", "4", "5", "6", "7"]
+
+        self.valorCorrigirYY = 0
+        self.valorCorrigirXX = 0
+        self.direitaXX = 0
+        self.esquerdaXX = 0
+        self.direitaYY = 0
+        self.esquerdaYY = 0
+        self.beco = 0
         
         self.origin = (0,0)
         self.visitableCoord = (0,0) #coordenadas que vao ser guardadas no array visitable
@@ -485,16 +493,47 @@ class MyRob(CRobLinkAngs):
 
             if(self.measures.compass >=-40 and self.measures.compass <=40) or (self.measures.compass <=-140 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=140):   #Se a bussola se encontra nestes graus entao o robot está na horizontal
                 
-                if (((self.measures.compass <=-160 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=160)) and self.orientacaoX == 1):      #se está virado para sul, mas acertou a posição em norte => PARAR MAIS TARDE
+                # if (((self.measures.compass <=-160 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=160)) and self.orientacaoX == 1):      #se está virado para sul, mas acertou a posição em norte => PARAR MAIS TARDE
+                #     deslocamentoX -= valorCorrigir
+                #     self.orientacaoX = 0
+                # elif self.measures.compass <= 30 and self.measures.compass >= -30 and self.orientacaoX == -1:  # se esta virado para norte, mas acertou a posição em sul => PARAR MAIS TARDE
+                #     deslocamentoX -= valorCorrigir
+                #     self.orientacaoX = 0
+                # elif self.orientacaoX != 0:  # se apenas acertou posição, tem de parar mais cedo
+                #     #print("apenas parar mais cedo")
+                #     deslocamentoX += valorCorrigir
+                #     self.orientacaoX = 0
+                if self.beco == 1:
                     deslocamentoX -= valorCorrigir
-                    self.orientacaoX = 0
-                elif self.measures.compass <= 30 and self.measures.compass >= -30 and self.orientacaoX == -1:  # se esta virado para norte, mas acertou a posição em sul => PARAR MAIS TARDE
+                    self.beco = 0
+
+                if (((self.measures.compass <=-160 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=160)) and self.direitaYY == 1):      #se está virado para esquerda, e estava encostado à direita => PARAR MAIS TARDE
                     deslocamentoX -= valorCorrigir
-                    self.orientacaoX = 0
-                elif self.orientacaoX != 0:  # se apenas acertou posição, tem de parar mais cedo
-                    #print("apenas parar mais cedo")
+                    self.direitaYY = 0
+                elif self.measures.compass <= 30 and self.measures.compass >= -30 and self.direitaYY == 1:  # se esta virado para direita, mas acertou a posição em sul => PARAR MAIS cedo
                     deslocamentoX += valorCorrigir
-                    self.orientacaoX = 0
+                    self.direitaYY = 0
+                elif (((self.measures.compass <=-160 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=160)) and self.direitaYY == -1):      #se está virado para esquerda, e estava encostado à direita => PARAR MAIS cedo
+                    deslocamentoX += valorCorrigir
+                    self.direitaYY = 0
+                elif self.measures.compass <= 30 and self.measures.compass >= -30 and self.direitaYY == -1:  # se esta virado para direita, mas acertou a posição em sul => PARAR MAIS tarde
+                    deslocamentoX -= valorCorrigir
+                    self.direitaYY = 0
+
+                if (((self.measures.compass <=-160 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=160)) and self.esquerdaYY == 1):      #se está virado para esquerda, e estava encostado à ESQUERDA => PARAR MAIS cedo
+                    deslocamentoX += valorCorrigir
+                    self.esquerdaYY = 0
+                elif self.measures.compass <= 30 and self.measures.compass >= -30 and self.esquerdaYY == 1:  # se esta virado para direita, mas acertou a posição em sul => PARAR MAIS tarde
+                    deslocamentoX -= valorCorrigir
+                    self.esquerdaYY = 0
+                elif (((self.measures.compass <=-160 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=160)) and self.esquerdaYY == -1):      #se está virado para esquerda, e estava encostado à ESQUERDA => PARAR MAIS tarde
+                    deslocamentoX -= valorCorrigir
+                    self.esquerdaYY = 0
+                elif self.measures.compass <= 30 and self.measures.compass >= -30 and self.esquerdaYY == -1:  # se esta virado para direita, mas acertou a posição em sul => PARAR MAIS cedo
+                    deslocamentoX += valorCorrigir
+                    self.esquerdaYY = 0
+
+
             
                 d_x = deslocamentoX - self.previousGps[0]
                 if (abs(d_x) < 2.0):  #Se a diferença entre a pos atual e anterior<2 apenas anda em frente pois não é o meio da célula
@@ -673,13 +712,31 @@ class MyRob(CRobLinkAngs):
                     if (newGPS[0], newGPS[1]) in self.visitable: #se a casa atual estiver nos visitaveis remove
                         self.visitable.remove((newGPS[0], newGPS[1]))
                     # para acertar posição do robot 
-                    if self.measures.irSensor[center_id]>= 1/0.45: 
-                        #print(1/self.measures.irSensor[center_id])
+                    
+                    # if self.measures.irSensor[center_id]>= 1/0.45: 
+                    #     #print(1/self.measures.irSensor[center_id])
+                    #     valorCorrigir = 0.44 -(1/self.measures.irSensor[center_id])
+                    #     if self.measures.compass <= 30 and self.measures.compass >= -30:    #se estiver virado para direita
+                    #         self.orientacaoX = 1
+                    #     elif (self.measures.compass <=-160 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=160):   #se estiver virado para esquerda
+                    #         self.orientacaoX = -1
+                    if self.measures.irSensor[right_id]>= 1/0.72 and self.measures.irSensor[center_id]>= 1/0.45 and self.measures.irSensor[left_id]>= 1/0.72:  #se está num beco
                         valorCorrigir = 0.44 -(1/self.measures.irSensor[center_id])
-                        if self.measures.compass <= 30 and self.measures.compass >= -30:    #se estiver virado para norte
-                            self.orientacaoX = 1
-                        elif (self.measures.compass <=-160 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=160):   #se estiver virado para sul
-                            self.orientacaoX = -1
+                        self.beco = 1    
+                    elif self.measures.irSensor[right_id]>= 1/0.45: 
+                        #print(1/self.measures.irSensor[center_id])
+                        valorCorrigir = 0.44 -(1/self.measures.irSensor[right_id])
+                        if self.measures.compass <= 30 and self.measures.compass >= -30:    #se estiver virado para direita
+                            self.direitaXX = 1
+                        elif (self.measures.compass <=-160 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=160):   #se estiver virado para esquerda
+                            self.direitaXX = -1
+                    elif self.measures.irSensor[left_id]>= 1/0.45: 
+                        #print(1/self.measures.irSensor[center_id])
+                        valorCorrigir = 0.44 -(1/self.measures.irSensor[left_id])
+                        if self.measures.compass <= 30 and self.measures.compass >= -30:    #se estiver virado para direita
+                            self.esquerdaXX = 1
+                        elif (self.measures.compass <=-160 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=160):   #se estiver virado para esquerda
+                            self.esquerdaXX = -1
                         
                     # if self.contadorCiclos>10 and len(self.visitable) == 0:#chamar o finish
                     #     print("chamar o finish")
@@ -701,18 +758,53 @@ class MyRob(CRobLinkAngs):
             #--------------------------DESLOCAMENTO NA VERTICAL--------------------------            
             elif (self.measures.compass >=60 and self.measures.compass <=120) or (self.measures.compass >=-120 and self.measures.compass <=-60):  #encontra-se na vertical   
 
-                if self.measures.compass >=-120 and self.measures.compass <=-60 and self.orientacaoY == 1:      #se está virado para baixo, mas acertou a posição em cima => PARAR MAIS TARDE
+                # if self.measures.compass >=-120 and self.measures.compass <=-60 and self.orientacaoY == 1:      #se está virado para baixo, mas acertou a posição em cima => PARAR MAIS TARDE
+                #     deslocamentoY -= valorCorrigir
+                #     self.orientacaoY = 0
+
+                # elif self.measures.compass >=60 and self.measures.compass <=120 and self.orientacaoY == -1:  # se esta virado para cima, mas acertou a posição em baixo => PARAR MAIS TARDE
+                #     deslocamentoY -= valorCorrigir 
+                #     self.orientacaoY = 0
+
+                # elif self.orientacaoY != 0:  # se apenas acertou posição, tem de parar mais cedo
+                #     #print("apenas parar mais cedo")
+                #     deslocamentoY += valorCorrigir
+                #     self.orientacaoY = 0
+                if self.beco == 1:
                     deslocamentoY -= valorCorrigir
-                    self.orientacaoY = 0
-
-                elif self.measures.compass >=60 and self.measures.compass <=120 and self.orientacaoY == -1:  # se esta virado para cima, mas acertou a posição em baixo => PARAR MAIS TARDE
-                    deslocamentoY -= valorCorrigir 
-                    self.orientacaoY = 0
-
-                elif self.orientacaoY != 0:  # se apenas acertou posição, tem de parar mais cedo
-                    #print("apenas parar mais cedo")
+                    self.beco = 0
+                if self.measures.compass >=-120 and self.measures.compass <=-60 and self.direitaXX == 1:      #se está virado para baixo, e estava encostado à direita => PARAR MAIS CEDO
                     deslocamentoY += valorCorrigir
-                    self.orientacaoY = 0
+                    self.direitaXX = 0
+
+                elif self.measures.compass >=60 and self.measures.compass <=120 and self.direitaXX == 1:  # se esta virado para cima, e estava encostado à direita => PARAR MAIS TARDE
+                    deslocamentoY -= valorCorrigir 
+                    self.direitaXX = 0
+                
+                elif self.measures.compass >=-120 and self.measures.compass <=-60 and self.direitaXX == -1:      #se está virado para baixo, e estava encostado à direita => PARAR MAIS TARDE
+                    deslocamentoY -= valorCorrigir
+                    self.direitaXX = 0
+
+                elif self.measures.compass >=60 and self.measures.compass <=120 and self.direitaXX == -1:  # se esta virado para cima, e estava encostado à direita => PARAR MAIS cedo
+                    deslocamentoY += valorCorrigir 
+                    self.direitaXX = 0
+
+
+                if self.measures.compass >=-120 and self.measures.compass <=-60 and self.esquerdaXX == 1:      #se está virado para baixo, e estava encostado à esquerda => PARAR MAIS tarde
+                    deslocamentoY -= valorCorrigir
+                    self.esquerdaXX = 0
+
+                elif self.measures.compass >=60 and self.measures.compass <=120 and self.esquerdaXX == 1:  # se esta virado para cima, e estava encostado à esquerda => PARAR MAIS cedo
+                    deslocamentoY += valorCorrigir 
+                    self.esquerdaXX = 0
+                
+                elif self.measures.compass >=-120 and self.measures.compass <=-60 and self.esquerdaXX == -1:      #se está virado para baixo, e estava encostado à esquerda => PARAR MAIS cedo
+                    deslocamentoY += valorCorrigir
+                    self.esquerdaXX = 0
+
+                elif self.measures.compass >=60 and self.measures.compass <=120 and self.esquerdaXX == -1:  # se esta virado para cima, e estava encostado à esquerda => PARAR MAIS tarde
+                    deslocamentoY -= valorCorrigir 
+                    self.esquerdaXX = 0
             
                 d_y = deslocamentoY - self.previousGps[1]
 
@@ -886,14 +978,34 @@ class MyRob(CRobLinkAngs):
                     if (newGPS[0], newGPS[1]) in self.visitable: #se a casa atual estiver nos visitaveis remove
                         self.visitable.remove((newGPS[0], newGPS[1]))
                     # para acertar posição do robot 
-                    if self.measures.irSensor[center_id]>= 1/0.45: #se estiver muito perto de uma parede corrige pos
+                    # if self.measures.irSensor[center_id]>= 1/0.45: #se estiver muito perto de uma parede corrige pos
 
-                        valorCorrigir = 0.44 -(1/self.measures.irSensor[center_id])
-                        if self.measures.compass >=60 and self.measures.compass <=120:    #se estiver virado para cima
-                            self.orientacaoY = 1
-                        elif self.measures.compass >=-120 and self.measures.compass <=-60:   #se estiver virado para baixo
-                            self.orientacaoY = -1
+                    #     valorCorrigir = 0.44 -(1/self.measures.irSensor[center_id])
+                    #     if self.measures.compass >=60 and self.measures.compass <=120:    #se estiver virado para cima
+                    #         self.orientacaoY = 1
+                    #     elif self.measures.compass >=-120 and self.measures.compass <=-60:   #se estiver virado para baixo
+                    #         self.orientacaoY = -1
                     
+                    if self.measures.irSensor[right_id]>= 1/0.72 and self.measures.irSensor[center_id]>= 1/0.45 and self.measures.irSensor[left_id]>= 1/0.72:  #se está num beco
+                        valorCorrigir = 0.44 -(1/self.measures.irSensor[center_id])
+                        self.beco = 1 
+                    elif self.measures.irSensor[right_id]>= 1/0.45: 
+                        #print(1/self.measures.irSensor[center_id])
+                        valorCorrigir = 0.44 -(1/self.measures.irSensor[right_id])
+                        if self.measures.compass >=60 and self.measures.compass <=120:    #se estiver virado para cima
+                            self.direitaYY = 1
+                        elif self.measures.compass >=-120 and self.measures.compass <=-60:   #se estiver virado para baixo
+                            self.direitaYY = -1
+                    elif self.measures.irSensor[left_id]>= 1/0.45: 
+                        #print(1/self.measures.irSensor[center_id])
+                        valorCorrigir = 0.44 -(1/self.measures.irSensor[left_id])
+                        if self.measures.compass >=60 and self.measures.compass <=120:    #se estiver virado para cima
+                            self.esquerdaYY = 1
+                        elif self.measures.compass >=-120 and self.measures.compass <=-60:   #se estiver virado para baixo
+                            self.esquerdaYY = -1
+
+
+
                     # if self.contadorCiclos>10 and len(self.visitable) == 0:#chamar o finish
                     #     print("chamar o finish")
                     #     self.writeMap()
