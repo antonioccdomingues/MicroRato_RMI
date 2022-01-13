@@ -84,7 +84,7 @@ class MyRob(CRobLinkAngs):
         self.orientacaoY = 0
         
         self.beaconsFound = [] #array para guardar os beacons encontrados
-        self.countPos = 0 #num de pos no array de beacons
+        self.groundMeasures = [] #array para guardar os ground measures 
 
     # In this map the center of cell (i,j), (i in 0..6, j in 0..13) is mapped to labMap[i*2][j*2].
     # to know if there is a wall on top of cell(i,j) (i in 0..5), check if the value of labMap[i*2+1][j*2] is space or not
@@ -395,11 +395,10 @@ class MyRob(CRobLinkAngs):
     def writeBeaconsFile(self):
         if len(self.beaconsFound) > 1:
             
-                for i in self.beaconsFound: #coloca os beacons com valores no map.out
-                    self.coordinates[i[1]][i[0]] = str(self.countPos)
-                    self.countPos+=1
-
-                self.countPos = 0
+                cntKey = 0
+                for key in self.beaconsFound[1:]: #coloca no map o valor do beacon
+                    self.coordinates[key[1]][key[0]] = str(self.groundMeasures[cntKey])
+                    cntKey+=1
 
                 cnt = 0
                 solucao = []
@@ -431,10 +430,11 @@ class MyRob(CRobLinkAngs):
                         for j in i:
                             cnt2+=1
                             if(cnt2%2!=0):
-                                j1 = ((j[0]-27), (j[1]-13))
+                                j1 = ((j[0]-27), ((j[1]-13)*(-1)))
                                 outfile.write(str(j1).replace(",", "").replace("(", "").replace(")", "")) 
                                 if j in self.beaconsFound[1:]: #nao compara com o 27,13    
-                                    outfile.write("#"+str(cnt3))
+                                    idx = self.beaconsFound.index(j)-1     
+                                    outfile.write("#"+str(self.groundMeasures[idx]))
                                 outfile.write("\n")
 
     def wander(self):
@@ -572,8 +572,8 @@ class MyRob(CRobLinkAngs):
                     if self.ACABAR == 1 and newGPS[0] == 27 and newGPS[1] == 13:
                         self.driveMotors(-0.15, -0.15)
                         self.coordinates[13][27] = "0"
-                        self.writeMap()
                         self.writeBeaconsFile()
+                        self.writeMap()
                         self.finish()
                         sys.exit()
                     self.previousGps[0] = round(deslocamentoX)  #atualiza a posição anterior
@@ -586,8 +586,7 @@ class MyRob(CRobLinkAngs):
                     if self.measures.ground > 0:
                         if ((newGPS[0], newGPS[1])) not in self.beaconsFound: #evita repetidos
                             self.beaconsFound.append((newGPS[0], newGPS[1])) 
-                            self.coordinates[newGPS[1]][newGPS[0]] = self.measures.ground
-                            self.countPos += 1
+                            self.groundMeasures.append(str(self.measures.ground))
 
                     #print("beacons array: ", self.beaconsFound) 
                     
@@ -875,8 +874,8 @@ class MyRob(CRobLinkAngs):
                     if self.ACABAR == 1 and newGPS[0] == 27 and newGPS[1] == 13:
                         self.driveMotors(-0.15, -0.15)
                         self.coordinates[13][27] = "0"
-                        self.writeMap()
                         self.writeBeaconsFile()
+                        self.writeMap()
                         self.finish()
                         sys.exit()
 
@@ -890,8 +889,7 @@ class MyRob(CRobLinkAngs):
                     if self.measures.ground > 0:
                         if ((newGPS[0], newGPS[1])) not in self.beaconsFound: #evita repetidos
                             self.beaconsFound.append((newGPS[0], newGPS[1])) 
-                            self.coordinates[newGPS[1]][newGPS[0]] = self.measures.ground
-                            self.countPos += 1
+                            self.groundMeasures.append(str(self.measures.ground))
 
                     #print("beacons array: ", self.beaconsFound)
                     #print(self.visitable)
