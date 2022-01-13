@@ -580,9 +580,7 @@ class MyRob(CRobLinkAngs):
 
                     #print(newGPS)
 
-                    self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
-                    l = -0.15
-                    r = -0.15
+                    
                     
                     #verifica se a posicao onde se encontra e um beacon
                     if self.measures.ground > 0:
@@ -608,6 +606,9 @@ class MyRob(CRobLinkAngs):
                         #self.driveMotors(-0.129, 0.129)
                         self.viraEsq = 1
                         deslocamentoX = math.floor(deslocamentoX)
+                        self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
+                        l = -0.15
+                        r = -0.15
                         self.updatePreviousMotors(0, 0)
 
                     elif((self.measures.irSensor[right_id]<= 1.176470588 and self.measures.compass <= 10 and self.measures.compass >= -10 and self.visited[newGPS[1]+2][newGPS[0]] != "X")\
@@ -615,12 +616,18 @@ class MyRob(CRobLinkAngs):
                         #self.driveMotors(0.129, -0.129)
                         self.viraDir = 1
                         deslocamentoX = math.floor(deslocamentoX)
+                        self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
+                        l = -0.15
+                        r = -0.15
                         self.updatePreviousMotors(0, 0)
 
                     elif (self.measures.irSensor[right_id]>= 1/0.72 and self.measures.irSensor[center_id]>= 1/0.72 and self.measures.irSensor[left_id]>= 1/0.72) and self.andaComAstar == 0:   #Está num beco, tem de inverter
                         #self.driveMotors(0.129, -0.129)
                         self.reverte = 1
                         deslocamentoX = math.floor(deslocamentoX)
+                        self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
+                        l = -0.15
+                        r = -0.15
                         self.updatePreviousMotors(0, 0)
                     
                     else:   #As posições à volta dele já estão todas visitadas
@@ -664,7 +671,7 @@ class MyRob(CRobLinkAngs):
                             
                             if self.measures.compass <= 30 and self.measures.compass >= -30: #se virado para a direita
                                 if(joystick == (-2,0)):
-                                    self.driveMotors(0.15,0.15)
+                                    self.driveMotors(0.13,0.13)
                                     l = 0.15
                                     r = 0.15
                                     self.updateSmallestPath()
@@ -672,25 +679,34 @@ class MyRob(CRobLinkAngs):
                                 elif(joystick == (2,0)):
                                     self.reverte = 1
                                     deslocamentoX = math.floor(deslocamentoX)
+                                    self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
+                                    l = -0.15
+                                    r = -0.15
                                     self.updatePreviousMotors(0, 0)
                                     self.updateSmallestPath()
 
                                 elif (joystick == (0,2)):
                                     self.viraEsq = 1
                                     deslocamentoX = math.floor(deslocamentoX)
+                                    self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
+                                    l = -0.15
+                                    r = -0.15
                                     self.updatePreviousMotors(0, 0)
                                     self.updateSmallestPath()
 
                                 elif (joystick == (0,-2)):
                                     self.viraDir = 1
                                     deslocamentoX = math.floor(deslocamentoX)
+                                    self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
+                                    l = -0.15
+                                    r = -0.15
                                     self.updatePreviousMotors(0, 0)
                                     self.updateSmallestPath()
 
                             else: #se esta virado para a esquerda
 
                                 if(joystick == (2,0) ):
-                                    self.driveMotors(0.15,0.15)
+                                    self.driveMotors(0.13,0.13)
                                     l = 0.15
                                     r = 0.15
                                     self.updateSmallestPath()
@@ -698,18 +714,27 @@ class MyRob(CRobLinkAngs):
                                 elif(joystick == (-2,0)):
                                     self.reverte = 1
                                     deslocamentoX = math.floor(deslocamentoX)
+                                    self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
+                                    l = -0.15
+                                    r = -0.15
                                     self.updatePreviousMotors(0, 0)
                                     self.updateSmallestPath()
 
                                 elif (joystick == (0,2)):
                                     self.viraDir = 1
                                     deslocamentoX = math.floor(deslocamentoX)
+                                    self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
+                                    l = -0.15
+                                    r = -0.15
                                     self.updatePreviousMotors(0, 0)
                                     self.updateSmallestPath()
 
                                 elif (joystick == (0,-2)):
                                     self.viraEsq = 1
                                     deslocamentoX = math.floor(deslocamentoX)
+                                    self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
+                                    l = -0.15
+                                    r = -0.15
                                     self.updatePreviousMotors(0, 0)
                                     self.updateSmallestPath()
 
@@ -728,22 +753,32 @@ class MyRob(CRobLinkAngs):
                     #     elif (self.measures.compass <=-160 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=160):   #se estiver virado para esquerda
                     #         self.orientacaoX = -1
                     if self.measures.irSensor[right_id]>= 1/0.72 and self.measures.irSensor[center_id]>= 1/0.45 and self.measures.irSensor[left_id]>= 1/0.72:  #se está num beco
-                        valorCorrigir = 0.44 -(1/self.measures.irSensor[center_id])
-                        self.beco = 1    
+                        valorCorrigir = 0.43 -(1/self.measures.irSensor[center_id])
+                        self.beco = 1
+                        self.direitaXX = 0  
+                        self.esquerdaXX = 0  
                     elif self.measures.irSensor[right_id]>= 1/0.45: 
                         #print(1/self.measures.irSensor[center_id])
-                        valorCorrigir = 0.435 -(1/self.measures.irSensor[right_id])
+                        valorCorrigir = 0.43 -(1/self.measures.irSensor[right_id])
                         if self.measures.compass <= 30 and self.measures.compass >= -30:    #se estiver virado para direita
                             self.direitaXX = 1
+                            self.beco = 0  
+                            self.esquerdaXX = 0
                         elif (self.measures.compass <=-160 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=160):   #se estiver virado para esquerda
                             self.direitaXX = -1
+                            self.beco = 0  
+                            self.esquerdaXX = 0
                     elif self.measures.irSensor[left_id]>= 1/0.45: 
                         #print(1/self.measures.irSensor[center_id])
-                        valorCorrigir = 0.435 -(1/self.measures.irSensor[left_id])
+                        valorCorrigir = 0.43 -(1/self.measures.irSensor[left_id])
                         if self.measures.compass <= 30 and self.measures.compass >= -30:    #se estiver virado para direita
                             self.esquerdaXX = 1
+                            self.direitaXX = 0
+                            self.beco = 0
                         elif (self.measures.compass <=-160 and self.measures.compass >=-180) or (self.measures.compass <=180 and self.measures.compass >=160):   #se estiver virado para esquerda
                             self.esquerdaXX = -1
+                            self.direitaXX = 0
+                            self.beco = 0
                         
                 if(self.viraDir ==0 and self.viraEsq == 0 and self.reverte == 0):
                     
@@ -847,9 +882,9 @@ class MyRob(CRobLinkAngs):
 
                     self.previousGps[1] = round(deslocamentoY) #atualiza a posição anterior
 
-                    self.driveMotors(-0.15, -0.15)
-                    l = -0.15
-                    r = -0.15
+                    # self.driveMotors(-0.15, -0.15)
+                    # l = -0.15
+                    # r = -0.15
                     
                     #verifica se a posicao onde se encontra e um beacon
                     if self.measures.ground > 0:
@@ -873,17 +908,26 @@ class MyRob(CRobLinkAngs):
                      or (self.measures.irSensor[left_id]<= 1.176470588 and (self.measures.compass > -100 and self.measures.compass < -80) and self.visited[newGPS[1]][newGPS[0]+2] != "X")) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a esquerda pois á esquerda nao tem parede e nao foi visitada                       
                         self.viraEsq = 1
                         deslocamentoY = math.floor(deslocamentoY)
+                        self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
+                        l = -0.15
+                        r = -0.15
                         self.updatePreviousMotors(0, 0)
 
                     elif((self.measures.irSensor[right_id]<= 1.176470588 and self.measures.compass <= 100 and self.measures.compass >= 80 and self.visited[newGPS[1]][newGPS[0]+2] != "X")\
                      or (self.measures.irSensor[right_id]<= 1.176470588 and (self.measures.compass > -100 and self.measures.compass < -80) and self.visited[newGPS[1]][newGPS[0]-2] != "X")) and self.andaComAstar == 0:     #Tem a possibilidade de ir para a direita pois à direita nao tem parede e nao foi visitada                        
                         self.viraDir = 1
                         deslocamentoY = math.floor(deslocamentoY)
+                        self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
+                        l = -0.15
+                        r = -0.15
                         self.updatePreviousMotors(0, 0)
 
                     elif ((self.measures.irSensor[right_id]>= 1/0.72 and self.measures.irSensor[center_id]>= 1/0.72 and self.measures.irSensor[left_id]>= 1/0.72)) and self.andaComAstar == 0:   #Está num beco, tem de inverter
                         self.reverte = 1
                         deslocamentoY = math.floor(deslocamentoY)
+                        self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
+                        l = -0.15
+                        r = -0.15
                         self.updatePreviousMotors(0, 0)
                     
                     else:   #As posições à volta dele já estão todas visitadas e ja nao ha x's por preencher
@@ -925,7 +969,7 @@ class MyRob(CRobLinkAngs):
 
                             if self.measures.compass <= 120 and self.measures.compass >= 60: #se virado para cima
                                 if(joystick == (0,2)):
-                                    self.driveMotors(0.15,0.15)
+                                    self.driveMotors(0.13,0.13)
                                     l = 0.15
                                     r = 0.15
                                     self.updateSmallestPath()
@@ -933,6 +977,9 @@ class MyRob(CRobLinkAngs):
                                 elif(joystick == (0,-2)):
                                     self.reverte = 1
                                     deslocamentoY = math.floor(deslocamentoY)
+                                    self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
+                                    l = -0.15
+                                    r = -0.15
                                     self.updatePreviousMotors(0, 0)
                                     self.updateSmallestPath()
 
@@ -940,18 +987,24 @@ class MyRob(CRobLinkAngs):
                                     self.viraEsq = 1
                                     self.updateSmallestPath()
                                     deslocamentoY = math.floor(deslocamentoY)
+                                    self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
+                                    l = -0.15
+                                    r = -0.15
                                     self.updatePreviousMotors(0, 0)
 
                                 elif (joystick == (-2,0)):
                                     self.viraDir = 1                                   
                                     deslocamentoY = math.floor(deslocamentoY)
+                                    self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
+                                    l = -0.15
+                                    r = -0.15
                                     self.updatePreviousMotors(0, 0)
                                     self.updateSmallestPath()
 
                             else: #se esta virado para baixo
 
                                 if(joystick == (0,-2)):
-                                    self.driveMotors(0.15,0.15)
+                                    self.driveMotors(0.13,0.13)
                                     l = 0.15
                                     r = 0.15
                                     self.updateSmallestPath()
@@ -959,18 +1012,27 @@ class MyRob(CRobLinkAngs):
                                 elif(joystick == (0,2)):
                                     self.reverte = 1
                                     deslocamentoY = math.floor(deslocamentoY)
+                                    self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
+                                    l = -0.15
+                                    r = -0.15
                                     self.updatePreviousMotors(0, 0)
                                     self.updateSmallestPath()
 
                                 elif (joystick == (-2,0)):
                                     self.viraEsq = 1
                                     deslocamentoY = math.floor(deslocamentoY)
+                                    self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
+                                    l = -0.15
+                                    r = -0.15
                                     self.updatePreviousMotors(0, 0)
                                     self.updateSmallestPath()
 
                                 elif (joystick == (2,0)):
                                     self.viraDir = 1
                                     deslocamentoY = math.floor(deslocamentoY)
+                                    self.driveMotors(-0.15, -0.15)                              #valores para a inércia das rodas
+                                    l = -0.15
+                                    r = -0.15
                                     self.updatePreviousMotors(0, 0)
                                     self.updateSmallestPath()
 
@@ -989,22 +1051,32 @@ class MyRob(CRobLinkAngs):
                     #         self.orientacaoY = -1
                     
                     if self.measures.irSensor[right_id]>= 1/0.72 and self.measures.irSensor[center_id]>= 1/0.45 and self.measures.irSensor[left_id]>= 1/0.72:  #se está num beco
-                        valorCorrigir = 0.44 -(1/self.measures.irSensor[center_id])
-                        self.beco = 1 
+                        valorCorrigir = 0.43 -(1/self.measures.irSensor[center_id])
+                        self.beco = 1
+                        self.direitaYY = 0
+                        self.esquerdaYY = 0
                     elif self.measures.irSensor[right_id]>= 1/0.45: 
                         #print(1/self.measures.irSensor[center_id])
-                        valorCorrigir = 0.435 -(1/self.measures.irSensor[right_id])
+                        valorCorrigir = 0.43 -(1/self.measures.irSensor[right_id])
                         if self.measures.compass >=60 and self.measures.compass <=120:    #se estiver virado para cima
                             self.direitaYY = 1
+                            self.beco = 0
+                            self.esquerdaYY = 0
                         elif self.measures.compass >=-120 and self.measures.compass <=-60:   #se estiver virado para baixo
                             self.direitaYY = -1
+                            self.beco = 0
+                            self.esquerdaYY = 0
                     elif self.measures.irSensor[left_id]>= 1/0.45: 
                         #print(1/self.measures.irSensor[center_id])
-                        valorCorrigir = 0.435 -(1/self.measures.irSensor[left_id])
+                        valorCorrigir = 0.43 -(1/self.measures.irSensor[left_id])
                         if self.measures.compass >=60 and self.measures.compass <=120:    #se estiver virado para cima
                             self.esquerdaYY = 1
+                            self.beco = 0
+                            self.direitaYY = 0
                         elif self.measures.compass >=-120 and self.measures.compass <=-60:   #se estiver virado para baixo
                             self.esquerdaYY = -1
+                            self.beco = 0
+                            self.direitaYY = 0
 
                 if(self.viraDir ==0 and self.viraEsq == 0 and self.reverte == 0):
                     
@@ -1012,10 +1084,10 @@ class MyRob(CRobLinkAngs):
                     deslocamentoY += self.mediaCoordenadas  #determinação do deslocamento horizontal(incrementa sempre)
                     self.updatePreviousMotors(l, r) #atualiza as potencias dos motores da itereção anterior (para se usar na prox iteração e fzr a média)
 
-        if self.contadorCiclos % 33 == 0: #pra imprimir o caminho ate ao beacon
-            self.contadorCiclos+=1
-            self.writeMap()
-            self.writeBeaconsFile()
+        # if self.contadorCiclos % 33 == 0: #pra imprimir o caminho ate ao beacon
+        #     self.contadorCiclos+=1
+        #     self.writeMap()
+        #     self.writeBeaconsFile()
 
         
 
