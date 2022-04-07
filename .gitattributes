@@ -1,1 +1,10 @@
 simulator/** linguist-detectable=false
+GUISample/** linguist-detectable=false
+Labs/** linguist-detectable=false
+Viewer/** linguist-detectable=false
+jClient/** linguist-detectable=false
+libRobSock/** linguist-detectable=false
+logplayer/** linguist-detectable=false
+robsample/** linguist-detectable=false
+simulator/** linguist-detectable=false
+
